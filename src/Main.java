@@ -15,7 +15,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  **/
 
-package net.codarch.bpowder;
+package powderinjava;
 
 public class Main {
 
