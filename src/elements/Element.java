@@ -1,29 +1,29 @@
 /**
  *	@Copyright 2015 Chris Beimers/firefreak11
  *
- *	This file is part of BeanPowder.
+ *	This file is part of PowderInJava.
  *
- *	BeanPowder is free software: you can redistribute it and/or modify
+ *	PowderInJava is free software: you can redistribute it and/or modify
  *	it under the terms of the GNU General Public License as published by
  *	the Free Software Foundation, either version 3 of the License, or
  *	(at your option) any later version.
  *
- *	BeanPowder is distributed in the hope that it will be useful,
+ *	PowderInJava is distributed in the hope that it will be useful,
  *	but WITHOUT ANY WARRANTY; without even the implied warranty of
  *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *	GNU General Public License for more details.
  *
  *	You should have received a copy of the GNU General Public License
- *	along with BeanPowder.  If not, see <http://www.gnu.org/licenses/>.
+ *	along with PowderInJava.  If not, see <http://www.gnu.org/licenses/>.
  **/
 
-package net.codarch.bpowder.elements;
+package powderinjava.elements;
 
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.codarch.bpowder.State;
+import powderinjava.State;
 
 /**
  * An Element Type
@@ -32,7 +32,7 @@ import net.codarch.bpowder.State;
 public abstract class Element {
 
 	public static List<Element> elements = new ArrayList<Element>();
-	public static Element air=new Air();
+	public static final Element AIR=new Air();
 	
 	public String name;
 	public State state;
@@ -57,4 +57,7 @@ public abstract class Element {
 		this.boils = state.equals(State.LIQUID) ? boils : false;
 		elements.add(this);
 	}
+	
+	/**Behaviour for adjacent particles*/
+	public abstract void update(int x, int y);
 }
