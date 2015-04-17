@@ -1,5 +1,5 @@
 /**
- *	@Copyright 2015 Chris Beimers/firefreak11
+ *	@Copyright 2015 firefreak11
  *
  *	This file is part of PowderInJava.
  *
@@ -21,5 +21,5 @@ package powderinjava;
 
 public enum State {
 
-	SOLID, LIQUID, GAS, POWDER
+	SOLID, LIQUID, GAS, POWDER, SPECIAL, QUANTUM
 }
