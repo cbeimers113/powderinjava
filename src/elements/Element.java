@@ -1,5 +1,5 @@
 /**
- *	@Copyright 2015 Chris Beimers/firefreak11
+ *	@Copyright 2015 firefreak11
  *
  *	This file is part of PowderInJava.
  *
@@ -20,19 +20,22 @@
 package powderinjava.elements;
 
 import java.awt.Color;
-import java.util.ArrayList;
-import java.util.List;
 
+import powderinjava.Main;
+import powderinjava.Particle;
 import powderinjava.State;
 
 /**
- * An Element Type
+ * An Element Type, 
+ * defines elemental behaviour
  */
 
 public abstract class Element {
 
-	public static List<Element> elements = new ArrayList<Element>();
-	public static final Element AIR=new Air();
+	public static final Element WATR=new WATR();
+	public static final Element NONE=new NONE();
+	public static final Element STNE=new STNE();
+	public static final Element OXGN=new OXGN();
 	
 	public String name;
 	public State state;
@@ -43,21 +46,51 @@ public abstract class Element {
 	public boolean flammable;
 	public boolean melts;
 	public boolean boils;
+	public boolean stacks;
 
-	public Element(String name, State state, Color colour, int mass,
-			boolean flammable, boolean melts, boolean boils) {
-		this.name = name.substring(0, 3);
+	public Element(String name, State state, int colour, int mass,
+			boolean flammable, boolean melts, boolean boils) {			
+		this.name = name.substring(0, 4);
 		this.state = state;
-		this.colour = colour;
+		this.colour = new Color(colour);
 		this.mass = state.equals(State.SOLID) ? 100
 				: state.equals(State.GAS) ? 0 : mass <= 0 ? 5
-						: mass >= 100 ? 95 : mass;
-		this.flammable = flammable;
+						: mass >= 100 ? 95 : mass;					//GAS:0, LIQUID:50-80, POWDER: 80-99, SOLID: 0, Less than 50 = VERY light elements
+		this.flammable = flammable;		
 		this.melts = state.equals(State.SOLID) ? melts : false;
 		this.boils = state.equals(State.LIQUID) ? boils : false;
-		elements.add(this);
+		/*switch(state){
+		case SOLID:
+			Main.powder.menu.solids.add(this);
+			break;
+		case LIQUID:
+			Main.powder.menu.liquids.add(this);
+			break;
+		case GAS:
+			Main.powder.menu.gasses.add(this);
+			break;
+		case POWDER:
+			Main.powder.menu.powders.add(this);
+			break;
+		case SPECIAL:
+			Main.powder.menu.hidden.add(this);
+			break;
+		case QUANTUM:
+			Main.powder.menu.quantum.add(this);
+			break;
+		}*/
+		Main.powder.menu.liquids.add(this);
 	}
 	
 	/**Behaviour for adjacent particles*/
-	public abstract void update(int x, int y);
+	public abstract void update(int x, int y, Particle p);
+	
+	/**Returns element of a specific particle*/
+	public static Element el(int x, int y){
+		try{
+			return Particle.particleAt(x, y).element;
+		}catch(NullPointerException e){
+			return NONE;
+		}
+	}
 }
