@@ -28,7 +28,7 @@ public class STNE extends Element{
 		super("STNE", State.POWDER, 0x666666, 80, false, true, false);
 	}
 	
-	public void update(int x, int y, Particle p){
-		
+	public int update(int x, int y, Particle p){
+		return 0;
 	}
 }
