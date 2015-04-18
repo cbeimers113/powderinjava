@@ -26,7 +26,7 @@ import powderinjava.State;
 public class OXGN extends Element{
 
 	public OXGN(){
-		super("OXGN",State.GAS,0x00ffaa,0,true,false,false);
+		super("OXGN",State.GAS,0x7FE5D7,0,true,false,false);
 	}
 
 	public void update(int x,int y,Particle p){
