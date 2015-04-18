@@ -20,7 +20,6 @@
 package powderinjava.elements;
 
 import java.awt.Color;
-
 import powderinjava.Main;
 import powderinjava.Particle;
 import powderinjava.State;
@@ -36,6 +35,7 @@ public abstract class Element {
 	public static final Element NONE=new NONE();
 	public static final Element STNE=new STNE();
 	public static final Element OXGN=new OXGN();
+	public static final Element HYGN=new HYGN();
 	
 	public String name;
 	public State state;
@@ -82,15 +82,30 @@ public abstract class Element {
 		Main.powder.menu.liquids.add(this);
 	}
 	
-	/**Behaviour for adjacent particles*/
-	public abstract void update(int x, int y, Particle p);
+	/**Behaviour for adjacent particles
+	 * @return: 0 if the particle remains unchanged, but must return greater than 0 if the particle changes. Ie: water+salt=saltwater. DO NOT remove 'return 0' at the end of the update function. Particle p is the particle on screen with this element. 
+	 */
+	public abstract int update(int x, int y, Particle p);
 	
 	/**Returns element of a specific particle*/
-	public static Element el(int x, int y){
+	public static Element elementAt(int x, int y){
 		try{
 			return Particle.particleAt(x, y).element;
 		}catch(NullPointerException e){
 			return NONE;
 		}
+	}
+	
+	/**Makes a particle with element e at x and y*/
+	public static void createPart(int x, int y, Element e){
+		if(Particle.particleAt(x,y)==null)
+			Main.powder.spawnParticle(x,y,e);
+	}
+	
+	/**Changes element of particle at x and y*/
+	public static void changePart(int x, int y, Element e){
+		if(Particle.particleAt(x,y)==null)createPart(x,y,e);
+		Particle np=Particle.particleAt(x,y);
+		np.element=e;
 	}
 }
