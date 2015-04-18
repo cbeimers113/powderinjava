@@ -29,7 +29,12 @@ public class OXGN extends Element{
 		super("OXGN",State.GAS,0x7FE5D7,0,true,false,false);
 	}
 
-	public void update(int x,int y,Particle p){
-
+	public int update(int x,int y,Particle p){
+		if(elementAt(x,y)==HYGN){
+			changePart(x,y,WATR);
+			changePart(p.x,p.y,NONE);
+			return 1;
+		}
+		return 0;
 	}
 }
