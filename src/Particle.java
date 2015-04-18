@@ -103,7 +103,7 @@ public class Particle{
 		for(int i=0;i<8;i++){
 			int ax=i<3?x-1:i<4?x:x+1;
 			int ay=i==0||i==3||i==5?y+1:i==1||i==6?y:y-1;
-			element.update(ax,ay,this); // Checks and updates for elemental behaviour surrounding this particle
+			if(element.update(ax,ay,this)!=0)break; // Checks and updates for elemental behaviour surrounding this particle
 		}
 		for(Particle p:particles){
 			if(p==null)continue;
@@ -111,15 +111,11 @@ public class Particle{
 			if(p.element.equals(Element.NONE))continue;
 			if(x==p.x&&y==p.y)y--;
 		}
-		if(x<0||y<0||x>Main.powder.width||y>Main.powder.height) remove();
+		if(x<Powder.xMarginLeft||y<Powder.yMarginTop||x>Powder.xMarginRight()||y>Powder.yMarginBottom()||element.equals(Element.NONE)) remove();
 	}
 
 	public void displace(int xDest,int yDest){
 		if(x+xDest==Powder.xMarginLeft||y+yDest==Powder.yMarginTop||x+xDest==Powder.xMarginRight()||y+yDest==Powder.yMarginBottom()){// Collide with the borders
-			return;
-		}
-		if(x+xDest<Powder.xMarginLeft||y+yDest<Powder.yMarginTop||x+xDest>Powder.xMarginRight()||y+yDest>Powder.yMarginBottom()){// If it is past the borders, remove it.
-			 remove();
 			return;
 		}
 		Particle check=particleAt(x+xDest,y+yDest);
