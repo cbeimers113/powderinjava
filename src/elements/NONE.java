@@ -29,7 +29,7 @@ public class NONE extends Element{
 		super("NONE", State.SOLID, 0x00000000, 100, false, false, false);
 	}
 
-	public void update(int x, int y, Particle p) {
-		
+	public int update(int x, int y, Particle p) {
+		return 0;
 	}
 }
