@@ -23,6 +23,7 @@ import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Toolkit;
 import java.awt.event.KeyListener;
@@ -144,7 +145,7 @@ public abstract class Engine extends Canvas implements KeyListener,MouseListener
 			return;
 		}
 		Graphics g=bs.getDrawGraphics();
-		tick();
+		update();
 		g.setColor(Color.black);
 		g.fillRect(0,0,width,height);
 		Main.powder.menu.render(g);
@@ -185,8 +186,12 @@ public abstract class Engine extends Canvas implements KeyListener,MouseListener
 		}
 		g.drawImage(img,0,0,null);
 		g.setFont(new Font("Arial",0,10));
+		FontMetrics fm=g.getFontMetrics();
 		g.setColor(new Color(0x06739E));
 		g.drawString(fpsOutput,5,15);
+		String particleData="x:"+Main.powder.mx+", y:"+Main.powder.my;
+		if(Particle.particleAt(Main.powder.mx,Main.powder.my)!=null)particleData=Particle.particleAt(Main.powder.mx,Main.powder.my).element.name+", "+particleData;
+		g.drawString(particleData,Powder.xMarginRight()-fm.stringWidth(particleData),15);
 		refresh();
 		g.dispose();
 		bs.show();
@@ -196,7 +201,7 @@ public abstract class Engine extends Canvas implements KeyListener,MouseListener
 	 * public BufferedImage zoom(BufferedImage originalImage){ BufferedImage resizedImage=new BufferedImage(width,height,BufferedImage.TYPE_INT_ARGB); Graphics2D g=resizedImage.createGraphics(); g.drawImage(originalImage,0,0,width,height,null); g.dispose(); return resizedImage; }
 	 */// for the zoom square thing
 
-	public abstract void tick();
+	public abstract void update();
 
 	public abstract void save();
 }
