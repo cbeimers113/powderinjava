@@ -42,6 +42,7 @@ public abstract class Element {
 	public Color colour;
 
 	public int mass;
+	public int temp;
 
 	public boolean flammable;
 	public boolean melts;
