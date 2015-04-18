@@ -28,7 +28,7 @@ public class WATR extends Element {
 		super("WATR", State.LIQUID, 0xff0000ff, 50, false, false, false);
 	}
 
-	public void update(int x, int y, Particle p) {
-			
+	public int update(int x, int y, Particle p) {
+		return 0;
 	}
 }
