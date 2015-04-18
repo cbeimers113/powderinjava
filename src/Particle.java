@@ -105,6 +105,12 @@ public class Particle{
 			int ay=i==0||i==3||i==5?y+1:i==1||i==6?y:y-1;
 			element.update(ax,ay,this); // Checks and updates for elemental behaviour surrounding this particle
 		}
+		for(Particle p:particles){
+			if(p==null)continue;
+			if(p==this)continue;
+			if(p.element.equals(Element.NONE))continue;
+			if(x==p.x&&y==p.y)y--;
+		}
 		if(x<0||y<0||x>Main.powder.width||y>Main.powder.height) remove();
 	}
 
@@ -118,22 +124,19 @@ public class Particle{
 		}
 		Particle check=particleAt(x+xDest,y+yDest);
 		if(check!=null){
+			
 			if(check.element.mass>=element.mass){
 				if(check.element.equals(element)){
 					if(element.stacks) return;
-					if(particleAt(x-1,y+1)==null){
-						displace(-1,1);
-						return;
-					}
-					if(particleAt(x+1,y+1)==null){
-						displace(1,1);
+					int nx=rand.nextInt(2)==0?1:-1;
+					if(!element.state.equals(State.GAS)&&particleAt(x+nx,y+1)==null){
+						displace(nx,1);
 						return;
 					}
 				}
 				return;
 			}
-			// check.displace(rand.nextInt(2)==0?1:-1,-1);
-			if(rand.nextInt(50)<=10) check.y--;
+			 check.displace(rand.nextInt(2)==0?1:-1,-1);
 		}
 		int px=x;
 		int py=y;
