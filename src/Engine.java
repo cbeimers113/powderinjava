@@ -34,6 +34,7 @@ import java.awt.event.WindowEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
+import java.util.Random;
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import powderinjava.elements.Element;
@@ -47,6 +48,7 @@ public abstract class Engine extends Canvas implements KeyListener,MouseListener
 	public Thread thread;
 	public BufferedImage img;
 	public String fpsOutput;
+	private Random rand;
 
 	public int width;
 	public int height;
@@ -63,6 +65,7 @@ public abstract class Engine extends Canvas implements KeyListener,MouseListener
 		this.resizable=resizable;
 		this.fullscreen=fullscreen;
 		fpsOutput="";
+		rand=new Random();
 		initialize();
 	}
 
@@ -148,35 +151,37 @@ public abstract class Engine extends Canvas implements KeyListener,MouseListener
 		if(Main.powder.fancyGraphics){
 			for(Particle p:Particle.particles){
 				if(p.removeQueue) continue;
+				Color glow=new Color(p.element.colour.getRed(),p.element.colour.getGreen(),p.element.colour.getBlue(),p.element.colour.getAlpha()/4);
 				if(p.element.state.equals(State.LIQUID)){
-					Color glow=new Color(p.element.colour.getRed(),p.element.colour.getGreen(),p.element.colour.getBlue(),p.element.colour.getAlpha()/4);
 					for(int i=0;i<4;i++){
 						int ax=i==0||i==2?0:i==1?1:-1;
 						int ay=i==0?-1:i==1||i==3?0:1;
 						img.setRGB(p.x+ax,p.y+ay,glow.getRGB());
 					}
+					img.setRGB(p.x,p.y,p.element.colour.getRGB());
 				}else if(p.element.state.equals(State.GAS)){
-					Color glow=new Color(p.element.colour.getRed(),p.element.colour.getGreen(),p.element.colour.getBlue(),p.element.colour.getAlpha()/4);
-					for(int i=0;i<4;i++){
-						int ax=i==0||i==2?0:i==1?1:-1;
-						int ay=i==0?-1:i==1||i==3?0:1;
-						img.setRGB(p.x+ax,p.y+ay,glow.getRGB());
+					int fPixel=0;
+					for(int i=0;i<8;i++){
+						Color cloud=new Color(glow.getRed(),glow.getGreen(),glow.getBlue(),rand.nextInt(20)+5);
+						int ax=i==0||i==6||i==7?-1:i==1||i==5?0:1;
+						int ay=i==0||i==1||i==2?-1:i==3||i==7?0:1;
+						img.setRGB(p.x+ax,p.y+ay,cloud.getRGB());
+						fPixel=ax;
 					}
+					for(int i=0;i<16;i++){
+						Color cloud=new Color(glow.getRed(),glow.getGreen(),glow.getBlue(),rand.nextInt(10)+5);
+						int ax=i==0||(i>=12&&i<=15)?-2:i>=4&&i<=8?2:i==1||i==11?-1:i==3||i==9?1:0;
+						int ay=i>=0&&i<=4?-2:i>=8&&i<=12?2:i==5||i==15?-1:i==7||i==13?1:0;
+						img.setRGB(p.x+ax,p.y+ay,cloud.getRGB());
+					}
+					img.setRGB(p.x,p.y,img.getRGB(p.x+fPixel,p.y));
 				}
 			}
 		}
-		for(Particle p:Particle.particles)
+		else for(Particle p:Particle.particles){
 			if(p.removeQueue)
 				continue;
-			else img.setRGB(p.x,p.y,p.element.colour.getRGB());
-		for(int y=0;y<Main.powder.v.height;y++){
-			for(int x=0;x<Main.powder.v.width;x++){
-				try{
-					if(Main.powder.v.vy[x][y]!=0) img.setRGB(x,y,new Color(200,50,50,(int)(Main.powder.v.vy[x][y]/10*255)).getRGB());
-				}catch(IllegalArgumentException e){
-					continue;
-				}
-			}
+			img.setRGB(p.x,p.y,p.element.colour.getRGB());
 		}
 		g.drawImage(img,0,0,null);
 		g.setFont(new Font("Arial",0,10));
