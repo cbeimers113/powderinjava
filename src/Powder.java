@@ -65,8 +65,8 @@ public class Powder extends Engine{
 	public VelocityMap v;
 	public Element spawnType;
 
-	private int mx;
-	private int my;
+	public int mx;
+	public int my;
 	private int cursorRadius;
 
 	public boolean fancyGraphics;
@@ -78,19 +78,20 @@ public class Powder extends Engine{
 		super("Powder In Java",650,475,false,false);
 	}
 
-	public void tick(){
+	public void update(){
 		if(spawning&&!erasing) fillCursor(cursorRadius);
 		if(!spawning&&erasing) eraseCursor(cursorRadius);
 		v.update();
 		for(Iterator<Particle> iterator=Particle.particles.iterator();iterator.hasNext();){
 			Particle particle=iterator.next();
+			if(particle.removeQueue)iterator.remove();
 			if(!paused) particle.update();
 		}
 		drawCursor(mx,my,cursorRadius);
 	}
 
 	public void spawnParticle(int x,int y,Element spawnType){
-		if(Particle.particleAt(x,y)!=null) return;
+		if(Particle.particleAt(x,y)!=null||x<=xMarginLeft||x>=xMarginRight()||y<=yMarginTop||y>=yMarginBottom()) return;
 		new Particle(x,y,spawnType);
 	}
 
