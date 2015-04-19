@@ -77,8 +77,8 @@ public class Particle{
 	}
 
 	public synchronized void update(){
-		if(removeQueue)return;
-		if(!element.state.equals(State.SOLID))if(++t%1/*(25-element.mass/4)*/==0){
+		if(removeQueue) return;
+		if(!element.state.equals(State.SOLID)) if(++t%1/* (25-element.mass/4) */==0){
 			switch(element.state){
 				case GAS:
 					displace(vx*(rand.nextInt(3)-1),vy*(rand.nextInt(3)-1));
@@ -103,13 +103,13 @@ public class Particle{
 		for(int i=0;i<8;i++){
 			int ax=i<3?x-1:i<4?x:x+1;
 			int ay=i==0||i==3||i==5?y+1:i==1||i==6?y:y-1;
-			if(element.update(ax,ay,this)!=0)break; // Checks and updates for elemental behaviour surrounding this particle
+			if(element.update(ax,ay,this)!=0) break; // Checks and updates for elemental behaviour surrounding this particle
 		}
 		for(Particle p:particles){
-			if(p==null)continue;
-			if(p==this)continue;
-			if(p.element.equals(Element.NONE))continue;
-			if(x==p.x&&y==p.y)y--;
+			if(p==null) continue;
+			if(p==this) continue;
+			if(p.element.equals(Element.NONE)) continue;
+			if(x==p.x&&y==p.y) y--;
 		}
 		if(x<Powder.xMarginLeft||y<Powder.yMarginTop||x>Powder.xMarginRight()||y>Powder.yMarginBottom()||element.equals(Element.NONE)) remove();
 	}
@@ -120,26 +120,26 @@ public class Particle{
 		}
 		Particle check=particleAt(x+xDest,y+yDest);
 		if(check!=null){
-			
+
 			if(check.element.mass>=element.mass){
 				if(check.element.equals(element)){
 					if(element.stacks) return;
 					int nx=rand.nextInt(2)==0?1:-1;
-					if(!element.state.equals(State.GAS)&&particleAt(x+nx,y+1)==null){
+					if(element.mass>=5&&particleAt(x+nx,y+1)==null){
 						displace(nx,1);
 						return;
 					}
 				}
 				return;
 			}
-			 check.displace(rand.nextInt(2)==0?1:-1,-1);
+			if(check!=this)check.displace(rand.nextInt(2)==0?1:-1,-1);
 		}
 		int px=x;
 		int py=y;
 		x+=xDest+Main.powder.v.vx[px][py];
 		y+=yDest+Main.powder.v.vy[px][py];
-		if(rand.nextInt(100)<=25)Main.powder.v.vx[px][py]+=xDest;
-		if(rand.nextInt(100)<=25)Main.powder.v.vy[px][py]+=yDest;
+		if(rand.nextInt(100)<=25) Main.powder.v.vx[px][py]+=xDest;
+		if(rand.nextInt(100)<=25) Main.powder.v.vy[px][py]+=yDest;
 	}
 
 	public static Particle particleAt(int x,int y){

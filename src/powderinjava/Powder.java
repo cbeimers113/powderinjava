@@ -62,7 +62,7 @@ public class Powder extends Engine{
 	}
 
 	public Menu menu;
-	public VelocityMap v;
+	public Physics v;
 	public Element spawnType;
 
 	public int mx;

@@ -117,7 +117,7 @@ public abstract class Engine extends Canvas implements KeyListener,MouseListener
 	public void run(){
 		Main.powder.menu=new Menu();
 		Main.powder.spawnType=Element.WATR;
-		Main.powder.v=new VelocityMap(width,height);
+		Main.powder.v=new Physics(width,height);
 		long timer=System.currentTimeMillis();
 		int frames=0;
 		int rFrames=frames;

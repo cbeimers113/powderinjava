@@ -20,9 +20,10 @@
 package powderinjava;
 
 import java.util.Random;
+import powderinjava.elements.Element;
 
 
-public class VelocityMap{
+public class Physics{
 	
 	private Random rand;
 	
@@ -30,8 +31,9 @@ public class VelocityMap{
 	public double[][]vy;
 	public int width;
 	public int height;
+	private int defaultBurnRate;
 	
-	public VelocityMap(int width, int height){
+	public Physics(int width, int height){
 		this.width=width;
 		this.height=height;
 		vx=new double[width][height];
@@ -40,6 +42,7 @@ public class VelocityMap{
 		for(int y=0;y<height;y++)
 			for(int x=0;x<width;x++)
 				vx[x][y]=vy[x][y]=0.0;
+		defaultBurnRate=50;
 	}
 	
 	public void update(){
@@ -49,5 +52,10 @@ public class VelocityMap{
 				if(vy[x][y]!=0&&rand.nextInt(100)<=10)vy[x][y]+=vy[x][y]<0?1:-1;
 			}
 		}
+	}
+	
+	public int getBurnRate(Element e){
+		if(!e.flammable)return 0;
+		return e.equals(Element.WOOD)?defaultBurnRate:defaultBurnRate;
 	}
 }
