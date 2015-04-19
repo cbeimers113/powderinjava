@@ -19,12 +19,12 @@
 
 package powderinjava;
 
+import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import powderinjava.elements.Element;
 
 public class Powder extends Engine{
@@ -45,13 +45,13 @@ public class Powder extends Engine{
 
 	public static int xMarginRight(){
 		try{
-			return Main.powder.width-xMarginLeft;
+			return Main.powder.getWidth()-xMarginLeft;
 		}catch(NullPointerException e){
 			return 0;
 		}
 	}
 
-	public static int yMarginTop=10;
+	public static int yMarginTop=20;
 
 	public static int yMarginBottom(){
 		try{
@@ -62,7 +62,7 @@ public class Powder extends Engine{
 	}
 
 	public Menu menu;
-	public Physics v;
+	public Physics physics;
 	public Element spawnType;
 
 	public int mx;
@@ -78,15 +78,33 @@ public class Powder extends Engine{
 		super("Powder In Java",650,475,false,false);
 	}
 
-	public void update(){
+	public void render(Graphics g){
+		for(Iterator<Particle> iterator=Particle.particles.iterator();iterator.hasNext();){
+			Particle p=iterator.next();
+			if(p.removeQueue){
+				iterator.remove();
+				continue;
+			}
+			if(Main.powder.fancyGraphics){
+				Color glow=new Color(p.element.colour.getRed(),p.element.colour.getGreen(),p.element.colour.getBlue(),p.element.colour.getAlpha());
+				if(p.element.state.equals(State.LIQUID)){
+					for(int i=0;i<4;i++){
+						int ax=i==0||i==2?0:i==1?1:-1;
+						int ay=i==0?-1:i==1||i==3?0:1;
+						img.setRGB(p.x+ax,p.y+ay,glow.getRGB());
+					}
+					img.setRGB(p.x,p.y,p.element.colour.getRGB());
+				}else if(p.element.state.equals(State.GAS)||p.element.state.equals(State.PLASMA)){
+					Color cloud=new Color(glow.getRed(),glow.getGreen(),glow.getBlue(),glow.getAlpha()/3);
+					g.setColor(cloud);
+					g.fillOval(p.x-3/2,p.y-3/2,3,3);
+				}else img.setRGB(p.x,p.y,p.element.colour.getRGB());
+			}else img.setRGB(p.x,p.y,p.element.colour.getRGB());
+			p.update();
+		}
 		if(spawning&&!erasing) fillCursor(cursorRadius);
 		if(!spawning&&erasing) eraseCursor(cursorRadius);
-		v.update();
-		for(Iterator<Particle> iterator=Particle.particles.iterator();iterator.hasNext();){
-			Particle particle=iterator.next();
-			if(particle.removeQueue)iterator.remove();
-			if(!paused) particle.update();
-		}
+		physics.update();
 		drawCursor(mx,my,cursorRadius);
 	}
 
@@ -206,33 +224,53 @@ public class Powder extends Engine{
 		int radiusError=1-x;
 		int mx=this.mx;
 		int my=this.my;
-		List<Particle> toRemove=new ArrayList<Particle>();
 		while(x>=y){
-			toRemove.add(Particle.particleAt(x+mx,y+my));
-			toRemove.add(Particle.particleAt(y+mx,x+my));
-			toRemove.add(Particle.particleAt(-x+mx,y+my));
-			toRemove.add(Particle.particleAt(-y+mx,x+my));
-			toRemove.add(Particle.particleAt(-x+mx,-y+my));
-			toRemove.add(Particle.particleAt(-y+mx,-x+my));
-			toRemove.add(Particle.particleAt(x+mx,-y+my));
-			toRemove.add(Particle.particleAt(y+mx,-x+my));
+			try{
+				Particle.particleAt(x+mx,y+my).remove();
+			}catch(NullPointerException e){
+
+			}
+			try{
+				Particle.particleAt(y+mx,x+my).remove();
+			}catch(NullPointerException e){
+
+			}
+			try{
+				Particle.particleAt(-x+mx,y+my).remove();
+			}catch(NullPointerException e){
+
+			}
+			try{
+				Particle.particleAt(-y+mx,x+my).remove();
+			}catch(NullPointerException e){
+
+			}
+			try{
+				Particle.particleAt(-x+mx,-y+my).remove();
+			}catch(NullPointerException e){
+
+			}
+			try{
+				Particle.particleAt(-y+mx,-x+my).remove();
+			}catch(NullPointerException e){
+
+			}
+			try{
+				Particle.particleAt(x+mx,-y+my).remove();
+			}catch(NullPointerException e){
+
+			}
+			try{
+				Particle.particleAt(y+mx,-x+my).remove();
+			}catch(NullPointerException e){
+
+			}
 			y++;
 			if(radiusError<0){
 				radiusError+=2*y+1;
 			}else{
 				x--;
 				radiusError+=2*(y-x)+1;
-			}
-		}
-		for(Iterator<Particle> iterator=Particle.particles.iterator();iterator.hasNext();){
-			Particle current=iterator.next();
-			for(Particle m:toRemove){
-				try{
-					if(m.equals(current))
-						iterator.remove();
-				}catch(NullPointerException e){
-					continue;
-				}
 			}
 		}
 		eraseCursor(--radius);

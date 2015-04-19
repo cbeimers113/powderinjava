@@ -44,8 +44,8 @@ public class Menu{
 		MSOLIDS=3;
 		MHIDDEN=4;
 		MQUANTUM=5;
-		elSize=30;
-		elHeight=elSize/3;
+		elSize=35;
+		elHeight=10;
 		menu=MLIQUIDS;
 	}
 
@@ -55,21 +55,30 @@ public class Menu{
 		this.b=b;
 	}
 
+	public static Color getContrastColor(Color color){
+		double y=(299*color.getRed()+587*color.getGreen()+114*color.getBlue())/1000;
+		return y>=128?Color.black:Color.white;
+	}
+
 	public void render(Graphics g){
 		g.setColor(Color.white);
-		g.drawLine(0,Powder.yMarginBottom(),Main.powder.width,Powder.yMarginBottom());
-		g.setFont(new Font("Arial",0,9));
+		g.drawLine(Powder.xMarginLeft,Powder.yMarginBottom(),Powder.xMarginRight(),Powder.yMarginBottom());
+		g.drawLine(Powder.xMarginLeft,Powder.yMarginBottom(),Powder.xMarginLeft,Powder.yMarginTop);
+		g.drawLine(Powder.xMarginLeft,Powder.yMarginTop,Powder.xMarginRight(),Powder.yMarginTop);
+		g.drawLine(Powder.xMarginRight(),Powder.yMarginTop,Powder.xMarginRight(),Powder.yMarginBottom());
+		g.setFont(new Font("Arial",1,9));
 		FontMetrics fm=g.getFontMetrics();
 		List<Element> list=toScan();
-		for(Element el:list){
-			int x=Main.powder.width-(2+list.indexOf(el))*elSize;
+		for(Element e:list){
+			int x=Powder.xMarginRight()-(1+list.indexOf(e))*(elSize+2);
 			int y=30*Main.powder.height/32-elHeight-1;
-			g.setColor(el.colour);
+			g.setColor(e.colour);
 			g.fillRect(x,y,elSize,elHeight);
-			g.setColor(Main.powder.spawnType.equals(el)?Color.green:Color.white);
-			g.drawString(el.name,x+elSize/2-fm.stringWidth(el.name)/2,y+elHeight-1);
+			g.setColor(getContrastColor(e.colour));
+			g.drawString(e.name,x+elSize/2-fm.stringWidth(e.name)/2,y+elHeight-1);
+			g.setColor(Color.white);
 			g.drawRect(x,y,elSize,elHeight);
-			if(b&&this.x>=x&&this.y>=y&&this.x<=x+elSize&&this.y<=y+elHeight) Main.powder.spawnType=el;
+			if(b&&this.x>=x&&this.y>=y&&this.x<=x+elSize&&this.y<=y+elHeight) Main.powder.spawnType=e;
 		}
 	}
 

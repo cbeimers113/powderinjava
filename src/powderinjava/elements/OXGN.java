@@ -37,4 +37,8 @@ public class OXGN extends Element{
 		}
 		return 0;
 	}
+
+	public void onSpawn(Particle p){
+		
+	}
 }

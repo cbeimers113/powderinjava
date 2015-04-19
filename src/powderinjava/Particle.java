@@ -38,9 +38,11 @@ public class Particle{
 
 	public int x;
 	public int y;
-	public int vx;
-	public int vy;
-	public int t;
+	public int dx;
+	public int dy;
+	public int life;
+	
+	public float temp;
 
 	public boolean removeQueue;
 
@@ -51,55 +53,60 @@ public class Particle{
 		rand=new Random();
 		switch(element.state){
 			case SOLID:
-				vx=vy=0;
+				dx=dy=0;
 				break;
 			case LIQUID:
-				vx=rand.nextInt(3)-1;
-				vy=1;
+				dx=rand.nextInt(3)-1;
+				dy=1;
 				break;
 			case GAS:
-				vx=rand.nextInt(3)-1;
-				vy=rand.nextInt(3)-1;
+				dx=rand.nextInt(3)-1;
+				dy=rand.nextInt(3)-1;
 				break;
 			case POWDER:
-				vx=0;
-				vy=1;
+				dx=0;
+				dy=1;
 				break;
 			case SPECIAL:
-				vx=vy=0;
+				dx=dy=0;
 				break;
 			case QUANTUM:
-				vx=rand.nextInt(2)==0?1:-1;
-				vy=rand.nextInt(2)==0?1:-1;
+				dx=rand.nextInt(2)==0?1:-1;
+				dy=rand.nextInt(2)==0?1:-1;
+				break;
+			case PLASMA:
+				dx=rand.nextInt(3)-1;
+				dy=rand.nextInt(2)-1;
 				break;
 		}
 		particles.add(this);
 	}
 
 	public synchronized void update(){
-		if(removeQueue) return;
-		if(!element.state.equals(State.SOLID)) if(++t%1/* (25-element.mass/4) */==0){
+		if(!element.state.equals(State.SOLID))
 			switch(element.state){
 				case GAS:
-					displace(vx*(rand.nextInt(3)-1),vy*(rand.nextInt(3)-1));
-					vx=rand.nextInt(3)-1;
-					vy=rand.nextInt(3)-1;
+					displace(dx*(rand.nextInt(3)-1),dy*(rand.nextInt(3)-1));
+					dx=rand.nextInt(3)-1;
+					dy=rand.nextInt(3)-1;
 					break;
 				case LIQUID:
-					displace(vx*(rand.nextInt(5)-2),vy*rand.nextInt(2));
-					vx=rand.nextInt(3)-1;
+					displace(dx*(rand.nextInt(5)-2),dy*rand.nextInt(2));
+					dx=rand.nextInt(3)-1;
 					break;
 				case POWDER:
-					displace(vx*(rand.nextInt(3)-1),vy);
+					displace(dx*(rand.nextInt(3)-1),dy);
 					break;
 				case QUANTUM:
-					displace(vx,vy);
+					displace(dx,dy);
 					break;
+				case PLASMA:
+					displace(dx*(rand.nextInt(3)-1),dy*(rand.nextInt(2)+1));
+					dx=rand.nextInt(3)-1;
+					dy=rand.nextInt(2)-1;
 				default:
-					break; // Don't need to update movement for solids.
+					break;
 			}
-			t=0;
-		}
 		for(int i=0;i<8;i++){
 			int ax=i<3?x-1:i<4?x:x+1;
 			int ay=i==0||i==3||i==5?y+1:i==1||i==6?y:y-1;
@@ -136,10 +143,9 @@ public class Particle{
 		}
 		int px=x;
 		int py=y;
-		x+=xDest+Main.powder.v.vx[px][py];
-		y+=yDest+Main.powder.v.vy[px][py];
-		if(rand.nextInt(100)<=25) Main.powder.v.vx[px][py]+=xDest;
-		if(rand.nextInt(100)<=25) Main.powder.v.vy[px][py]+=yDest;
+		x+=xDest*(Main.powder.physics.vx[px][py]+1);
+		y+=yDest*(Main.powder.physics.vy[px][py]+1);
+		//update velocities
 	}
 
 	public static Particle particleAt(int x,int y){

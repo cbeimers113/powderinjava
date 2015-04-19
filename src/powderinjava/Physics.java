@@ -19,43 +19,64 @@
 
 package powderinjava;
 
-import java.util.Random;
 import powderinjava.elements.Element;
 
 
 public class Physics{
 	
-	private Random rand;
-	
-	public double[][]vx;
-	public double[][]vy;
+	private static int defaultBurnRate;
+		
+	public float[][]vx;
+	public float[][]vy;
 	public int width;
 	public int height;
-	private int defaultBurnRate;
 	
 	public Physics(int width, int height){
 		this.width=width;
 		this.height=height;
-		vx=new double[width][height];
-		vy=new double[width][height];
-		rand=new Random();
+		vx=new float[width][height];
+		vy=new float[width][height];
 		for(int y=0;y<height;y++)
 			for(int x=0;x<width;x++)
-				vx[x][y]=vy[x][y]=0.0;
+				vx[x][y]=vy[x][y]=0.0f;
 		defaultBurnRate=50;
 	}
 	
 	public void update(){
 		for(int y=0;y<height;y++){
 			for(int x=0;x<width;x++){
-				if(vx[x][y]!=0&&rand.nextInt(100)<=10)vx[x][y]+=vx[x][y]<0?1:-1;
-				if(vy[x][y]!=0&&rand.nextInt(100)<=10)vy[x][y]+=vy[x][y]<0?1:-1;
+				float vxAv=0.0f;
+				float vyAv=0.0f;
+				for(int i=0;i<8;i++){
+					int ax=i==0||i==6||i==7?-1:i==1||i==5?0:1;
+					int ay=i==0||i==1||i==2?-1:i==3||i==7?0:1;
+					try{
+						vxAv+=vx[ax][ay];
+					}catch(ArrayIndexOutOfBoundsException e){
+						continue;
+					}
+					try{
+						vyAv+=vy[ax][ay];
+					}catch(ArrayIndexOutOfBoundsException e){
+						continue;
+					}
+				}
+				vx[x][y]=vxAv/8.0f;
+				vy[x][y]=vyAv/8.0f;
 			}
 		}
 	}
 	
-	public int getBurnRate(Element e){
+	public void addAir(int x, int y, int radius){
+		
+	}
+	
+	public float getVelocity(int x, int y){
+		return (float)Math.sqrt(vx[x][y]*vx[x][y]+vy[x][y]*vy[x][y]);
+	}
+	
+	public static int getBurnRate(Element e){
 		if(!e.flammable)return 0;
-		return e.equals(Element.WOOD)?defaultBurnRate:defaultBurnRate;
+		return e.equals(Element.WOOD)?defaultBurnRate:e.equals(Element.OXGN)||e.equals(Element.HYGN)?5:defaultBurnRate;
 	}
 }

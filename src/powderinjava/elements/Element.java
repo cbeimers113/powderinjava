@@ -36,13 +36,13 @@ public abstract class Element{
 	public static final Element OXGN=new OXGN();
 	public static final Element HYGN=new HYGN();
 	public static final Element WOOD=new WOOD();
+	public static final Element FIRE=new FIRE();
 
 	public String name;
 	public State state;
 	public Color colour;
 
 	public int mass;
-	public int temp;
 
 	public boolean flammable;
 	public boolean melts;
@@ -63,6 +63,9 @@ public abstract class Element{
 		 */
 		Main.powder.menu.liquids.add(this);
 	}
+	
+	/**Called when the element is spawned on screen, used to se initial temp/life/whatever based on surroundings or defaults.*/
+	public abstract void onSpawn(Particle p);
 
 	/**
 	 * Behaviour for adjacent particles

@@ -25,7 +25,10 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Toolkit;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -35,7 +38,6 @@ import java.awt.event.WindowEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
-import java.util.Random;
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import powderinjava.elements.Element;
@@ -49,7 +51,6 @@ public abstract class Engine extends Canvas implements KeyListener,MouseListener
 	public Thread thread;
 	public BufferedImage img;
 	public String fpsOutput;
-	private Random rand;
 
 	public int width;
 	public int height;
@@ -66,7 +67,6 @@ public abstract class Engine extends Canvas implements KeyListener,MouseListener
 		this.resizable=resizable;
 		this.fullscreen=fullscreen;
 		fpsOutput="";
-		rand=new Random();
 		initialize();
 	}
 
@@ -86,6 +86,12 @@ public abstract class Engine extends Canvas implements KeyListener,MouseListener
 
 			public void windowClosing(WindowEvent e){
 				isCloseRequested=true;
+			}
+		});
+		frame.addComponentListener(new ComponentAdapter(){
+
+			public void componentResized(ComponentEvent evt){
+
 			}
 		});
 		try{
@@ -117,7 +123,8 @@ public abstract class Engine extends Canvas implements KeyListener,MouseListener
 	public void run(){
 		Main.powder.menu=new Menu();
 		Main.powder.spawnType=Element.WATR;
-		Main.powder.v=new Physics(width,height);
+		Main.powder.physics=new Physics(width,height);
+		Main.powder.fancyGraphics=true;
 		long timer=System.currentTimeMillis();
 		int frames=0;
 		int rFrames=frames;
@@ -145,63 +152,32 @@ public abstract class Engine extends Canvas implements KeyListener,MouseListener
 			return;
 		}
 		Graphics g=bs.getDrawGraphics();
-		update();
 		g.setColor(Color.black);
 		g.fillRect(0,0,width,height);
 		Main.powder.menu.render(g);
-		if(Main.powder.fancyGraphics){
-			for(Particle p:Particle.particles){
-				if(p.removeQueue) continue;
-				Color glow=new Color(p.element.colour.getRed(),p.element.colour.getGreen(),p.element.colour.getBlue(),p.element.colour.getAlpha()/4);
-				if(p.element.state.equals(State.LIQUID)){
-					for(int i=0;i<4;i++){
-						int ax=i==0||i==2?0:i==1?1:-1;
-						int ay=i==0?-1:i==1||i==3?0:1;
-						img.setRGB(p.x+ax,p.y+ay,glow.getRGB());
-					}
-					img.setRGB(p.x,p.y,p.element.colour.getRGB());
-				}else if(p.element.state.equals(State.GAS)){
-					int fPixel=0;
-					for(int i=0;i<8;i++){
-						Color cloud=new Color(glow.getRed(),glow.getGreen(),glow.getBlue(),rand.nextInt(20)+5);
-						int ax=i==0||i==6||i==7?-1:i==1||i==5?0:1;
-						int ay=i==0||i==1||i==2?-1:i==3||i==7?0:1;
-						img.setRGB(p.x+ax,p.y+ay,cloud.getRGB());
-						fPixel=ax;
-					}
-					for(int i=0;i<16;i++){
-						Color cloud=new Color(glow.getRed(),glow.getGreen(),glow.getBlue(),rand.nextInt(10)+5);
-						int ax=i==0||(i>=12&&i<=15)?-2:i>=4&&i<=8?2:i==1||i==11?-1:i==3||i==9?1:0;
-						int ay=i>=0&&i<=4?-2:i>=8&&i<=12?2:i==5||i==15?-1:i==7||i==13?1:0;
-						img.setRGB(p.x+ax,p.y+ay,cloud.getRGB());
-					}
-					img.setRGB(p.x,p.y,img.getRGB(p.x+fPixel,p.y));
-				}
-			}
-		}
-		else for(Particle p:Particle.particles){
-			if(p.removeQueue)
-				continue;
-			img.setRGB(p.x,p.y,p.element.colour.getRGB());
-		}
+		render(g);
 		g.drawImage(img,0,0,null);
 		g.setFont(new Font("Arial",0,10));
 		FontMetrics fm=g.getFontMetrics();
 		g.setColor(new Color(0x06739E));
 		g.drawString(fpsOutput,5,15);
-		String particleData="x:"+Main.powder.mx+", y:"+Main.powder.my;
-		if(Particle.particleAt(Main.powder.mx,Main.powder.my)!=null)particleData=Particle.particleAt(Main.powder.mx,Main.powder.my).element.name+", "+particleData;
+		String particleData="x:"+Main.powder.mx+", y:"+Main.powder.my+" Velocity: "+Main.powder.physics.getVelocity(Main.powder.mx,Main.powder.my);
+		if(Particle.particleAt(Main.powder.mx,Main.powder.my)!=null) particleData=Particle.particleAt(Main.powder.mx,Main.powder.my).element.name+", "+particleData;
 		g.drawString(particleData,Powder.xMarginRight()-fm.stringWidth(particleData),15);
 		refresh();
 		g.dispose();
 		bs.show();
 	}
 
-	/*
-	 * public BufferedImage zoom(BufferedImage originalImage){ BufferedImage resizedImage=new BufferedImage(width,height,BufferedImage.TYPE_INT_ARGB); Graphics2D g=resizedImage.createGraphics(); g.drawImage(originalImage,0,0,width,height,null); g.dispose(); return resizedImage; }
-	 */// for the zoom square thing
-
-	public abstract void update();
+	public BufferedImage zoom(BufferedImage originalImage){
+		BufferedImage resizedImage=new BufferedImage(width,height,BufferedImage.TYPE_INT_ARGB);
+		Graphics2D g=resizedImage.createGraphics();
+		g.drawImage(originalImage,0,0,width,height,null);
+		g.dispose();
+		return resizedImage;
+	}
 
 	public abstract void save();
+	
+	public abstract void render(Graphics g);
 }
