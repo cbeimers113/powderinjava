@@ -28,6 +28,7 @@ public class Physics{
 		
 	public float[][]vx;
 	public float[][]vy;
+	public float[][]pv;
 	public int width;
 	public int height;
 	
@@ -36,6 +37,7 @@ public class Physics{
 		this.height=height;
 		vx=new float[width][height];
 		vy=new float[width][height];
+		pv=new float[width][height];
 		for(int y=0;y<height;y++)
 			for(int x=0;x<width;x++)
 				vx[x][y]=vy[x][y]=0.0f;
@@ -45,7 +47,9 @@ public class Physics{
 	public void update(){
 		for(int y=0;y<height;y++){
 			for(int x=0;x<width;x++){
-				float vxAv=0.0f;
+				vx[x][y]=abs(vx[x][y]-pv[x][y]);
+				vy[x][y]=abs(vy[x][y]-pv[x][y]);
+				float vxAv=0.0f;	//Average velocities
 				float vyAv=0.0f;
 				for(int i=0;i<8;i++){
 					int ax=i==0||i==6||i==7?-1:i==1||i==5?0:1;
@@ -63,12 +67,17 @@ public class Physics{
 				}
 				vx[x][y]=vxAv/8.0f;
 				vy[x][y]=vyAv/8.0f;
+				pv[x][y]=(float)Math.sqrt(vx[x][y]*vx[x][y]+vy[x][y]*vy[x][y]);
 			}
 		}
 	}
 	
-	public void addAir(int x, int y, int radius){
-		
+	private float abs(float f){
+		return f<0?-f:f;
+	}
+	
+	public void addAir(int x, int y, float pressure){
+		pv[x][y]+=pressure;
 	}
 	
 	public float getVelocity(int x, int y){

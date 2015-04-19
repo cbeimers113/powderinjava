@@ -13,6 +13,7 @@ public class FIRE extends Element{
 	}
 
 	public int update(int x,int y,Particle p){
+		if(--p.life==0)p.remove();
 		if(elementAt(x,y).flammable){
 			if(++flameTimer%Physics.getBurnRate(elementAt(x,y))==0){
 				changePart(x,y,this);
@@ -23,6 +24,7 @@ public class FIRE extends Element{
 	}
 
 	public void onSpawn(Particle p){
+		p.life=rand.nextInt(1000)+500;
 		p.temp=400.0f;
 	}
 }

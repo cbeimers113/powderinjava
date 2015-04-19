@@ -100,11 +100,11 @@ public class Powder extends Engine{
 					g.fillOval(p.x-3/2,p.y-3/2,3,3);
 				}else img.setRGB(p.x,p.y,p.element.colour.getRGB());
 			}else img.setRGB(p.x,p.y,p.element.colour.getRGB());
-			p.update();
+			if(!paused)p.update();
 		}
 		if(spawning&&!erasing) fillCursor(cursorRadius);
 		if(!spawning&&erasing) eraseCursor(cursorRadius);
-		physics.update();
+		if(!paused)physics.update();
 		drawCursor(mx,my,cursorRadius);
 	}
 

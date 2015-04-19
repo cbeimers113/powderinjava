@@ -20,6 +20,7 @@
 package powderinjava.elements;
 
 import java.awt.Color;
+import java.util.Random;
 import powderinjava.Main;
 import powderinjava.Particle;
 import powderinjava.State;
@@ -41,7 +42,8 @@ public abstract class Element{
 	public String name;
 	public State state;
 	public Color colour;
-
+	protected Random rand;
+	
 	public int mass;
 
 	public boolean flammable;
@@ -61,6 +63,7 @@ public abstract class Element{
 		/*
 		 * switch(state){ case SOLID: Main.powder.menu.solids.add(this); break; case LIQUID: Main.powder.menu.liquids.add(this); break; case GAS: Main.powder.menu.gasses.add(this); break; case POWDER: Main.powder.menu.powders.add(this); break; case SPECIAL: Main.powder.menu.hidden.add(this); break; case QUANTUM: Main.powder.menu.quantum.add(this); break; }
 		 */
+		rand=new Random();
 		Main.powder.menu.liquids.add(this);
 	}
 	

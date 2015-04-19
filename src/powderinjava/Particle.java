@@ -79,6 +79,7 @@ public class Particle{
 				dy=rand.nextInt(2)-1;
 				break;
 		}
+		element.onSpawn(this);
 		particles.add(this);
 	}
 
@@ -103,7 +104,7 @@ public class Particle{
 				case PLASMA:
 					displace(dx*(rand.nextInt(3)-1),dy*(rand.nextInt(2)+1));
 					dx=rand.nextInt(3)-1;
-					dy=rand.nextInt(2)-1;
+					dy=rand.nextInt(2)-2;
 				default:
 					break;
 			}
@@ -145,7 +146,7 @@ public class Particle{
 		int py=y;
 		x+=xDest*(Main.powder.physics.vx[px][py]+1);
 		y+=yDest*(Main.powder.physics.vy[px][py]+1);
-		//update velocities
+		
 	}
 
 	public static Particle particleAt(int x,int y){
