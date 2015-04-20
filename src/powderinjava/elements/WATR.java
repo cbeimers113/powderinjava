@@ -31,8 +31,4 @@ public class WATR extends Element {
 	public int update(int x, int y, Particle p) {
 		return 0;
 	}
-
-	public void onSpawn(Particle p){
-		
-	}
 }

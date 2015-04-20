@@ -21,71 +21,72 @@ package powderinjava;
 
 import powderinjava.elements.Element;
 
-
 public class Physics{
-	
+
 	private static int defaultBurnRate;
-		
-	public float[][]vx;
-	public float[][]vy;
-	public float[][]pv;
+	private static float defaultHeatCapacity;
+	public static float maxTemp;
+	static{
+		defaultBurnRate=50;
+		defaultHeatCapacity=0.5f;
+		maxTemp=10000.0f;
+	}
+
+	public float[][] pv;
 	public int width;
 	public int height;
-	
-	public Physics(int width, int height){
+
+	public Physics(int width,int height){
 		this.width=width;
 		this.height=height;
-		vx=new float[width][height];
-		vy=new float[width][height];
 		pv=new float[width][height];
-		for(int y=0;y<height;y++)
-			for(int x=0;x<width;x++)
-				vx[x][y]=vy[x][y]=0.0f;
-		defaultBurnRate=50;
 	}
-	
+
 	public void update(){
 		for(int y=0;y<height;y++){
 			for(int x=0;x<width;x++){
-				vx[x][y]=abs(vx[x][y]-pv[x][y]);
-				vy[x][y]=abs(vy[x][y]-pv[x][y]);
-				float vxAv=0.0f;	//Average velocities
-				float vyAv=0.0f;
+				// Average pressure
+				float pAv=0.0f;
 				for(int i=0;i<8;i++){
 					int ax=i==0||i==6||i==7?-1:i==1||i==5?0:1;
 					int ay=i==0||i==1||i==2?-1:i==3||i==7?0:1;
 					try{
-						vxAv+=vx[ax][ay];
-					}catch(ArrayIndexOutOfBoundsException e){
-						continue;
-					}
-					try{
-						vyAv+=vy[ax][ay];
+						pAv+=pv[x+ax][y+ay];
 					}catch(ArrayIndexOutOfBoundsException e){
 						continue;
 					}
 				}
-				vx[x][y]=vxAv/8.0f;
-				vy[x][y]=vyAv/8.0f;
-				pv[x][y]=(float)Math.sqrt(vx[x][y]*vx[x][y]+vy[x][y]*vy[x][y]);
+				pv[x][y]=pAv/8;
 			}
 		}
 	}
-	
-	private float abs(float f){
-		return f<0?-f:f;
-	}
-	
-	public void addAir(int x, int y, float pressure){
+
+	public void addAir(int x,int y,float pressure){
 		pv[x][y]+=pressure;
 	}
-	
-	public float getVelocity(int x, int y){
-		return (float)Math.sqrt(vx[x][y]*vx[x][y]+vy[x][y]*vy[x][y]);
-	}
-	
+
 	public static int getBurnRate(Element e){
-		if(!e.flammable)return 0;
-		return e.equals(Element.WOOD)?defaultBurnRate:e.equals(Element.OXGN)||e.equals(Element.HYGN)?5:defaultBurnRate;
+		if(!e.flammable) return 0;
+		return e.equals(Element.WOOD)?defaultBurnRate:e.equals(Element.OXGN)||e.equals(Element.HYGN)?5:e.equals(Element.COAL)?150:defaultBurnRate;
+	}
+
+	public static float getHeatCapacity(Element e){
+		if(e==Element.COAL||e==Element.STNE){
+			return 0.17f;
+		}else if(e==Element.HYGN||e==Element.OXGN){
+			return 3.42f;
+		}else if(e==Element.FIRE||e==Element.SMKE){
+			return 0.49f;
+		}else if(e==Element.SALT){
+			return 0.21f;
+		}else if(e==Element.WOOD){
+			return 0.41f;
+		}else if(e==Element.WATR){
+			return 1.0f;
+		}else if(e==Element.NONE){
+			return 0.0f;
+		}else{
+			return defaultHeatCapacity;
+		}
 	}
 }

@@ -24,6 +24,7 @@ import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import powderinjava.elements.Element;
 
@@ -79,32 +80,35 @@ public class Powder extends Engine{
 	}
 
 	public void render(Graphics g){
-		for(Iterator<Particle> iterator=Particle.particles.iterator();iterator.hasNext();){
-			Particle p=iterator.next();
-			if(p.removeQueue){
-				iterator.remove();
-				continue;
+		try{
+			for(Iterator<Particle> iterator=Particle.particles.iterator();iterator.hasNext();){
+				Particle p=iterator.next();
+				if(p.removeQueue){
+					iterator.remove();
+					continue;
+				}
+				if(Main.powder.fancyGraphics){
+					Color glow=new Color(p.extraColour.getRed(),p.extraColour.getGreen(),p.extraColour.getBlue(),p.extraColour.getAlpha());
+					if(p.type.state.equals(State.LIQUID)){
+						for(int i=0;i<4;i++){
+							int ax=i==0||i==2?0:i==1?1:-1;
+							int ay=i==0?-1:i==1||i==3?0:1;
+							img.setRGB(p.x+ax,p.y+ay,glow.getRGB());
+						}
+						img.setRGB(p.x,p.y,p.type.colour.getRGB());
+					}else if(p.type.state.equals(State.GAS)||p.type.state.equals(State.PLASMA)){
+						Color pixel=new Color(glow.getRed(),glow.getGreen(),glow.getBlue(),glow.getAlpha()/3);
+						g.setColor(pixel);
+						g.fillOval(p.x-3/2,p.y-3/2,3,3);
+					}else img.setRGB(p.x,p.y,p.type.colour.getRGB());
+				}else img.setRGB(p.x,p.y,p.type.colour.getRGB());
+				if(!paused) p.update();
 			}
-			if(Main.powder.fancyGraphics){
-				Color glow=new Color(p.element.colour.getRed(),p.element.colour.getGreen(),p.element.colour.getBlue(),p.element.colour.getAlpha());
-				if(p.element.state.equals(State.LIQUID)){
-					for(int i=0;i<4;i++){
-						int ax=i==0||i==2?0:i==1?1:-1;
-						int ay=i==0?-1:i==1||i==3?0:1;
-						img.setRGB(p.x+ax,p.y+ay,glow.getRGB());
-					}
-					img.setRGB(p.x,p.y,p.element.colour.getRGB());
-				}else if(p.element.state.equals(State.GAS)||p.element.state.equals(State.PLASMA)){
-					Color cloud=new Color(glow.getRed(),glow.getGreen(),glow.getBlue(),glow.getAlpha()/3);
-					g.setColor(cloud);
-					g.fillOval(p.x-3/2,p.y-3/2,3,3);
-				}else img.setRGB(p.x,p.y,p.element.colour.getRGB());
-			}else img.setRGB(p.x,p.y,p.element.colour.getRGB());
-			if(!paused)p.update();
+		}catch(ConcurrentModificationException e){
 		}
 		if(spawning&&!erasing) fillCursor(cursorRadius);
 		if(!spawning&&erasing) eraseCursor(cursorRadius);
-		if(!paused)physics.update();
+		if(!paused) physics.update();
 		drawCursor(mx,my,cursorRadius);
 	}
 
@@ -124,6 +128,12 @@ public class Powder extends Engine{
 				break;
 			case KeyEvent.VK_1:
 				fancyGraphics=!fancyGraphics;
+				break;
+			case 91:
+				if(cursorRadius>0) cursorRadius--;
+				break;
+			case 93:
+				cursorRadius++;
 				break;
 		}
 	}

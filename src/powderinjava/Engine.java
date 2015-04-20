@@ -162,7 +162,8 @@ public abstract class Engine extends Canvas implements KeyListener,MouseListener
 		g.setColor(new Color(0x06739E));
 		g.drawString(fpsOutput,5,15);
 		String particleData="x:"+Main.powder.mx+", y:"+Main.powder.my+" Pressure: "+Main.powder.physics.pv[Main.powder.mx][Main.powder.my];
-		if(Particle.particleAt(Main.powder.mx,Main.powder.my)!=null) particleData=Particle.particleAt(Main.powder.mx,Main.powder.my).element.name+", "+particleData;
+		Particle p=Particle.particleAt(Main.powder.mx,Main.powder.my);
+		if(p!=null) particleData=p.type.name+", temp: "+p.temp+"\u00b0C, life: "+p.life+", "+particleData;
 		g.drawString(particleData,Powder.xMarginRight()-fm.stringWidth(particleData),15);
 		refresh();
 		g.dispose();

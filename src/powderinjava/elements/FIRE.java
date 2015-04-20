@@ -1,5 +1,6 @@
 package powderinjava.elements;
 
+import java.awt.Color;
 import powderinjava.Particle;
 import powderinjava.Physics;
 import powderinjava.State;
@@ -13,18 +14,21 @@ public class FIRE extends Element{
 	}
 
 	public int update(int x,int y,Particle p){
-		if(--p.life==0)p.remove();
+		try{
+			p.extraColour=new Color(255,(int)(p.temp/p.tempInit)*255,0,colour.getAlpha());
+		}catch(IllegalArgumentException e){
+			p.extraColour=colour;
+		}
+		if(--p.life==0){
+			changeType(p.x,p.y,SMKE);
+			return 1;
+		}
 		if(elementAt(x,y).flammable){
 			if(++flameTimer%Physics.getBurnRate(elementAt(x,y))==0){
-				changePart(x,y,this);
+				changeType(x,y,this);
 				return 1;
 			}
 		}
 		return 0;
-	}
-
-	public void onSpawn(Particle p){
-		p.life=rand.nextInt(1000)+500;
-		p.temp=400.0f;
 	}
 }

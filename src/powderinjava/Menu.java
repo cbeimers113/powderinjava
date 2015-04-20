@@ -76,7 +76,7 @@ public class Menu{
 			g.fillRect(x,y,elSize,elHeight);
 			g.setColor(getContrastColor(e.colour));
 			g.drawString(e.name,x+elSize/2-fm.stringWidth(e.name)/2,y+elHeight-1);
-			g.setColor(Color.white);
+			g.setColor(e.equals(Main.powder.spawnType)?Color.green:Color.white);
 			g.drawRect(x,y,elSize,elHeight);
 			if(b&&this.x>=x&&this.y>=y&&this.x<=x+elSize&&this.y<=y+elHeight) Main.powder.spawnType=e;
 		}

@@ -31,14 +31,10 @@ public class OXGN extends Element{
 
 	public int update(int x,int y,Particle p){
 		if(elementAt(x,y)==HYGN){
-			changePart(x,y,WATR);
-			changePart(p.x,p.y,NONE);
+			changeType(x,y,WATR);
+			changeType(p.x,p.y,NONE);
 			return 1;
 		}
 		return 0;
-	}
-
-	public void onSpawn(Particle p){
-		
 	}
 }

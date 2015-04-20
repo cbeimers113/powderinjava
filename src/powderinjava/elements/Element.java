@@ -31,14 +31,17 @@ import powderinjava.State;
 
 public abstract class Element{
 
-	public static final Element WATR=new WATR();
 	public static final Element NONE=new NONE();
+	public static final Element WATR=new WATR();
+	public static final Element FIRE=new FIRE();
 	public static final Element STNE=new STNE();
+	public static final Element SALT=new SALT();
 	public static final Element OXGN=new OXGN();
 	public static final Element HYGN=new HYGN();
 	public static final Element WOOD=new WOOD();
-	public static final Element FIRE=new FIRE();
-
+	public static final Element COAL=new COAL();
+	public static final Element SMKE=new SMKE();
+	
 	public String name;
 	public State state;
 	public Color colour;
@@ -66,9 +69,6 @@ public abstract class Element{
 		rand=new Random();
 		Main.powder.menu.liquids.add(this);
 	}
-	
-	/**Called when the element is spawned on screen, used to se initial temp/life/whatever based on surroundings or defaults.*/
-	public abstract void onSpawn(Particle p);
 
 	/**
 	 * Behaviour for adjacent particles
@@ -76,13 +76,30 @@ public abstract class Element{
 	 * @return: 0 if the particle remains unchanged, but must return greater than 0 if the particle changes. Ie: water+salt=saltwater. DO NOT remove 'return 0' at the end of the update function. Particle p is the particle on screen with this element.
 	 */
 	public abstract int update(int x,int y,Particle p);
-
-	/** Returns element of a specific particle */
-	public static Element elementAt(int x,int y){
-		try{
-			return Particle.particleAt(x,y).element;
-		}catch(NullPointerException e){
-			return NONE;
+	
+	/**DO NOT OVERRIDE unless you are an idiot or you have an excellent reason.*/
+	public void doPhysics(int x, int y, Particle p){
+		Particle adj=Particle.particleAt(x,y);
+		if(adj==null)return;
+		if(p.temp>adj.temp){
+			p.temp--;
+			adj.temp++;
+		}else if(p.temp<adj.temp){
+			p.temp++;
+			adj.temp--;
+		}
+	}
+	
+	/**Again, DO NOT override or mess up.*/
+	public void onSpawn(Particle p){
+		if(p.type==FIRE){
+			p.life=rand.nextInt(100)+300;
+			p.temp=rand.nextInt(1000)+1000.0f;
+		}else if(p.type==SMKE){
+			p.life=rand.nextInt(1000)+500;
+			p.temp=rand.nextInt(200)+100.0f;
+		}else{
+			p.temp=22.0f;
 		}
 	}
 
@@ -92,9 +109,18 @@ public abstract class Element{
 	}
 
 	/** Changes element of particle at x and y */
-	public static void changePart(int x,int y,Element e){
+	public static void changeType(int x,int y,Element e){
 		if(Particle.particleAt(x,y)==null) createPart(x,y,e);
 		Particle np=Particle.particleAt(x,y);
-		np.element=e;
+		np.type=e;
+	}
+	
+	/** Returns element of a specific particle */
+	public static Element elementAt(int x,int y){
+		try{
+			return Particle.particleAt(x,y).type;
+		}catch(NullPointerException e){
+			return NONE;
+		}
 	}
 }
