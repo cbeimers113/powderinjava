@@ -30,6 +30,7 @@ public class NONE extends Element{
 	}
 
 	public int update(int x, int y, Particle p) {
+		p.remove();
 		return 0;
 	}
 }

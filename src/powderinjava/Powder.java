@@ -78,12 +78,25 @@ public class Powder extends Engine{
 	public Powder(){
 		super("Powder In Java",650,475,false,false);
 	}
+	
+	public void init(){
+		menu=new Menu();
+		spawnType=Element.WATR;
+		physics=new Physics(width,height);
+		fancyGraphics=true;
+		for(int y=0;y<height;y++){
+			for(int x=0;x<width;x++){
+				Physics.pmap[x][y]=null;
+			}
+		}
+	}
 
 	public void render(Graphics g){
 		try{
 			for(Iterator<Particle> iterator=Particle.particles.iterator();iterator.hasNext();){
 				Particle p=iterator.next();
 				if(p.removeQueue){
+					Physics.pmap[p.x][p.y]=null;
 					iterator.remove();
 					continue;
 				}

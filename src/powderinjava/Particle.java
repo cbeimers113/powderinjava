@@ -21,7 +21,6 @@ package powderinjava;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import powderinjava.elements.Element;
@@ -33,7 +32,7 @@ import powderinjava.elements.Element;
 public class Particle{
 
 	public static List<Particle> particles=new ArrayList<Particle>();
-
+	
 	public Element type;
 	public Element ctype;
 	public Color extraColour;
@@ -45,13 +44,13 @@ public class Particle{
 	public float vx;
 	public float vy;
 	public int life;
-	
+
 	public float tempInit;
 	public float temp;
 
 	public boolean removeQueue;
 
-	public Particle(int x,int y,Element type, Element...ctype){
+	public Particle(int x,int y,Element type,Element...ctype){
 		this.x=x;
 		this.y=y;
 		this.type=type;
@@ -96,43 +95,40 @@ public class Particle{
 	}
 
 	public synchronized void update(){
-		if(!type.state.equals(State.SOLID))
-			switch(type.state){
-				case GAS:
-					displace((int)(vx*(rand.nextInt(3)-1)),(int)(vy*(rand.nextInt(3)-1)));
-					vx=rand.nextInt(3)-1;
-					vy=rand.nextInt(3)-1;
-					break;
-				case LIQUID:
-					displace((int)(vx*(rand.nextInt(5)-2)),(int)(vy*rand.nextInt(2)));
-					vx=rand.nextInt(3)-1;
-					break;
-				case POWDER:
-					displace((int)(vx*(rand.nextInt(3)-1)),(int)vy);
-					break;
-				case QUANTUM:
-					displace((int)vx,(int)vy);
-					break;
-				case PLASMA:
-					displace((int)(vx*(rand.nextInt(3)-1)),(int)(vy*(rand.nextInt(2)+1)));
-					vx=rand.nextInt(3)-1;
-					vy=rand.nextInt(2)-2;
-				default:
-					break;
-			}
+		if(!type.state.equals(State.SOLID)) switch(type.state){
+			case GAS:
+				displace((int)(vx*(rand.nextInt(3)-1)),(int)(vy*(rand.nextInt(3)-1)));
+				vx=rand.nextInt(3)-1;
+				vy=rand.nextInt(3)-1;
+				break;
+			case LIQUID:
+				displace((int)(vx*(rand.nextInt(5)-2)),(int)(vy*rand.nextInt(2)));
+				vx=rand.nextInt(3)-1;
+				break;
+			case POWDER:
+				displace((int)(vx*(rand.nextInt(3)-1)),(int)vy);
+				break;
+			case QUANTUM:
+				displace((int)vx,(int)vy);
+				break;
+			case PLASMA:
+				displace((int)(vx*(rand.nextInt(3)-1)),(int)(vy*(rand.nextInt(2)+1)));
+				vx=rand.nextInt(3)-1;
+				vy=rand.nextInt(2)-2;
+			default:
+				break;
+		}
 		for(int i=0;i<8;i++){
 			int ax=i<3?x-1:i<4?x:x+1;
 			int ay=i==0||i==3||i==5?y+1:i==1||i==6?y:y-1;
 			type.doPhysics(ax,ay,this);
-			if(type.update(ax,ay,this)==1) break; 
+			if(type.update(ax,ay,this)==1) break;
 		}
-		for(Particle p:particles){
-			if(p==null) continue;
-			if(p==this) continue;
-			if(p.type.equals(Element.NONE)) continue;
-			if(x==p.x&&y==p.y) y--;
+		if(x<Powder.xMarginLeft||y<Powder.yMarginTop||x>Powder.xMarginRight()||y>Powder.yMarginBottom()||type.equals(Element.NONE))
+			remove();
+		else{
+			if(Physics.pmap[x][y]==null) Physics.pmap[x][y]=this;
 		}
-		if(x<Powder.xMarginLeft||y<Powder.yMarginTop||x>Powder.xMarginRight()||y>Powder.yMarginBottom()||type.equals(Element.NONE)) remove();
 	}
 
 	public void displace(int xDest,int yDest){
@@ -153,21 +149,21 @@ public class Particle{
 				}
 				return;
 			}
-			if(check!=this)check.displace(rand.nextInt(2)==0?1:-1,-1);
+			if(check!=this) 
+				check.displace(rand.nextInt(2)==0?1:-1,-1);
 		}
-		if(++t%((type.mass>>5)+1)==0){
+		if(++t%1/*((type.mass>>5)+1)*/==0){
+			int px=x;
+			int py=y;
 			x+=xDest;
 			y+=yDest;
+			Physics.pmap[px][py]=null;
 			t=0;
 		}
 	}
 
 	public static Particle particleAt(int x,int y){
-		for(Iterator<Particle> iterator=particles.iterator();iterator.hasNext();){
-			Particle particle=iterator.next();
-			if(particle.x==x&&particle.y==y) return particle;
-		}
-		return null;
+		return Physics.pmap[x][y];
 	}
 
 	public void remove(){

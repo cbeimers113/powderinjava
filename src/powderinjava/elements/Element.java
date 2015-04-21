@@ -23,6 +23,7 @@ import java.awt.Color;
 import java.util.Random;
 import powderinjava.Main;
 import powderinjava.Particle;
+import powderinjava.Physics;
 import powderinjava.State;
 
 /**
@@ -41,6 +42,7 @@ public abstract class Element{
 	public static final Element WOOD=new WOOD();
 	public static final Element COAL=new COAL();
 	public static final Element SMKE=new SMKE();
+	public static final Element C4=new C4();
 	
 	public String name;
 	public State state;
@@ -56,7 +58,23 @@ public abstract class Element{
 	public boolean glows;
 
 	public Element(String name,State state,int colour,int mass,boolean flammable,boolean melts,boolean boils){
-		this.name=name.substring(0,4);
+		try{
+			this.name=name.substring(0,4);
+		}catch(StringIndexOutOfBoundsException fourChar){
+			try{
+				this.name=name.substring(0,3);
+			}catch(StringIndexOutOfBoundsException threeChar){
+				try{
+					this.name=name.substring(0,2);
+				}catch(StringIndexOutOfBoundsException twoChar){
+					try{
+						this.name=name.substring(0,1);
+					}catch(StringIndexOutOfBoundsException oneChar){
+						this.name="NULL";
+					}
+				}
+			}
+		}
 		this.state=state;
 		this.colour=new Color(colour);
 		this.mass=state.equals(State.SOLID)?100:state.equals(State.GAS)?0:mass<=0?5:mass>=100?95:mass; // GAS:0, LIQUID:50-80, POWDER: 80-99, SOLID: 0, Less than 50 = VERY light elements
@@ -80,13 +98,16 @@ public abstract class Element{
 	/**DO NOT OVERRIDE unless you are an idiot or you have an excellent reason.*/
 	public void doPhysics(int x, int y, Particle p){
 		Particle adj=Particle.particleAt(x,y);
-		if(adj==null)return;
+		if(adj==null){
+			p.temp-=Physics.getHeatCapacity(this);
+			return;
+		}
 		if(p.temp>adj.temp){
-			p.temp--;
-			adj.temp++;
+			p.temp-=Physics.getHeatCapacity(this)*adj.temp;
+			adj.temp+=Physics.getHeatCapacity(adj.type)*p.temp;
 		}else if(p.temp<adj.temp){
-			p.temp++;
-			adj.temp--;
+			p.temp+=Physics.getHeatCapacity(this)*adj.temp;
+			adj.temp-=Physics.getHeatCapacity(adj.type)*p.temp;
 		}
 	}
 	
@@ -109,10 +130,10 @@ public abstract class Element{
 	}
 
 	/** Changes element of particle at x and y */
-	public static void changeType(int x,int y,Element e){
-		if(Particle.particleAt(x,y)==null) createPart(x,y,e);
-		Particle np=Particle.particleAt(x,y);
-		np.type=e;
+	public static void changeType(Particle p, Element e){
+		p.type=e;
+		p.extraColour=e.colour;
+		e.onSpawn(p);
 	}
 	
 	/** Returns element of a specific particle */

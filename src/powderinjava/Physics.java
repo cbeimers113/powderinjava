@@ -23,6 +23,8 @@ import powderinjava.elements.Element;
 
 public class Physics{
 
+	public static Particle[][] pmap=new Particle[Main.powder.width][Main.powder.height];
+
 	private static int defaultBurnRate;
 	private static float defaultHeatCapacity;
 	public static float maxTemp;
@@ -67,7 +69,7 @@ public class Physics{
 
 	public static int getBurnRate(Element e){
 		if(!e.flammable) return 0;
-		return e.equals(Element.WOOD)?defaultBurnRate:e.equals(Element.OXGN)||e.equals(Element.HYGN)?5:e.equals(Element.COAL)?150:defaultBurnRate;
+		return e.equals(Element.WOOD)?defaultBurnRate:e.equals(Element.OXGN)||e.equals(Element.HYGN)?5:e.equals(Element.COAL)?150:e.equals(Element.C4)?1:defaultBurnRate;
 	}
 
 	public static float getHeatCapacity(Element e){

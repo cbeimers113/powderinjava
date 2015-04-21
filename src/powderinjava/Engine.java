@@ -40,7 +40,6 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
-import powderinjava.elements.Element;
 
 public abstract class Engine extends Canvas implements KeyListener,MouseListener,MouseMotionListener,MouseWheelListener,Runnable{
 
@@ -121,10 +120,7 @@ public abstract class Engine extends Canvas implements KeyListener,MouseListener
 	}
 
 	public void run(){
-		Main.powder.menu=new Menu();
-		Main.powder.spawnType=Element.WATR;
-		Main.powder.physics=new Physics(width,height);
-		Main.powder.fancyGraphics=true;
+		Main.powder.init();
 		long timer=System.currentTimeMillis();
 		int frames=0;
 		int rFrames=frames;

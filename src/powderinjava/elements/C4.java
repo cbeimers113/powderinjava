@@ -14,25 +14,19 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  **/
-
 package powderinjava.elements;
 
 import powderinjava.Particle;
 import powderinjava.State;
 
+public class C4 extends Element{
 
-public class SMKE extends Element{
-
-	public SMKE(){
-		super("SMKE",State.PLASMA,0x454545,0,false,false,false);
+	public C4(){
+		super("C4",State.SOLID,0xff00c3,100,true,false,false);
 	}
 
 	public int update(int x,int y,Particle p){
-		if(--p.life<=0){
-			p.remove();
-			return 1;
-		}
-		if(p.temp>=400.0f){
+		if(elementAt(x,y)==FIRE){
 			changeType(p,FIRE);
 			return 1;
 		}

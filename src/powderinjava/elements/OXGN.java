@@ -31,8 +31,8 @@ public class OXGN extends Element{
 
 	public int update(int x,int y,Particle p){
 		if(elementAt(x,y)==HYGN){
-			changeType(x,y,WATR);
-			changeType(p.x,p.y,NONE);
+			changeType(p,WATR);
+			changeType(Particle.particleAt(x,y),NONE);
 			return 1;
 		}
 		return 0;
