@@ -119,6 +119,7 @@ public class Powder extends Engine{
 			}
 		}catch(ConcurrentModificationException e){
 		}
+		physics.tempView=img;
 		if(spawning&&!erasing) fillCursor(cursorRadius);
 		if(!spawning&&erasing) eraseCursor(cursorRadius);
 		if(!paused) physics.update();
@@ -197,7 +198,11 @@ public class Powder extends Engine{
 	public void mouseMoved(MouseEvent e){
 		mx=e.getX();
 		my=e.getY();
-		menu.grabMouse(mx,my,false);
+		try{
+			menu.grabMouse(mx,my,false);
+		}catch(NullPointerException e2){
+			return;
+		}
 	}
 
 	public void mouseWheelMoved(MouseWheelEvent e){

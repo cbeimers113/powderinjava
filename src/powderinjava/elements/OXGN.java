@@ -22,11 +22,10 @@ package powderinjava.elements;
 import powderinjava.Particle;
 import powderinjava.State;
 
-
 public class OXGN extends Element{
 
 	public OXGN(){
-		super("OXGN",State.GAS,0x7FE5D7,0,true,false,false);
+		super("OXGN",State.GAS,0x7FE5D7,0,3.42f,true,false,false);
 	}
 
 	public int update(int x,int y,Particle p){

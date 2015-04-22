@@ -43,13 +43,15 @@ public abstract class Element{
 	public static final Element COAL=new COAL();
 	public static final Element SMKE=new SMKE();
 	public static final Element C4=new C4();
-	
+
 	public String name;
 	public State state;
 	public Color colour;
 	protected Random rand;
-	
+
 	public int mass;
+	
+	public float heat;
 
 	public boolean flammable;
 	public boolean melts;
@@ -57,7 +59,7 @@ public abstract class Element{
 	public boolean stacks;
 	public boolean glows;
 
-	public Element(String name,State state,int colour,int mass,boolean flammable,boolean melts,boolean boils){
+	public Element(String name,State state,int colour,int mass,float heat,boolean flammable,boolean melts,boolean boils){
 		try{
 			this.name=name.substring(0,4);
 		}catch(StringIndexOutOfBoundsException fourChar){
@@ -78,6 +80,7 @@ public abstract class Element{
 		this.state=state;
 		this.colour=new Color(colour);
 		this.mass=state.equals(State.SOLID)?100:state.equals(State.GAS)?0:mass<=0?5:mass>=100?95:mass; // GAS:0, LIQUID:50-80, POWDER: 80-99, SOLID: 0, Less than 50 = VERY light elements
+		this.heat=heat;
 		this.flammable=flammable;
 		this.melts=state.equals(State.SOLID)?melts:false;
 		this.boils=state.equals(State.LIQUID)?boils:false;
@@ -91,34 +94,40 @@ public abstract class Element{
 	/**
 	 * Behaviour for adjacent particles
 	 * 
-	 * @return: 0 if the particle remains unchanged, but must return greater than 0 if the particle changes. Ie: water+salt=saltwater. DO NOT remove 'return 0' at the end of the update function. Particle p is the particle on screen with this element.
+	 * @return: 0 if the particle remains unchanged, but must return 1 if the particle changes. Ie: water+salt=saltwater. DO NOT remove 'return 0' at the end of the update function. Particle p is the particle on screen with this element.
 	 */
 	public abstract int update(int x,int y,Particle p);
-	
-	/**DO NOT OVERRIDE unless you are an idiot or you have an excellent reason.*/
-	public void doPhysics(int x, int y, Particle p){
+
+	/** DO NOT OVERRIDE unless you are an idiot or you have an excellent reason. */
+	public void doPhysics(int x,int y,Particle p){
 		Particle adj=Particle.particleAt(x,y);
 		if(adj==null){
-			p.temp-=Physics.getHeatCapacity(this);
+			if(p.temp>Physics.tv[x][y]){
+				if(p.temp>Physics.minTemp)p.temp-=this.heat*Physics.tv[x][y];
+				if(Physics.tv[x][y]<Physics.maxTemp)Physics.tv[x][y]+=NONE.heat*p.temp;
+			}else if(p.temp<Physics.tv[x][y]){
+				if(p.temp<Physics.maxTemp)p.temp+=this.heat*Physics.tv[x][y];
+				if(Physics.tv[x][y]>Physics.minTemp)Physics.tv[x][y]-=NONE.heat*p.temp;
+			}
 			return;
 		}
 		if(p.temp>adj.temp){
-			p.temp-=Physics.getHeatCapacity(this)*adj.temp;
-			adj.temp+=Physics.getHeatCapacity(adj.type)*p.temp;
+			p.temp-=this.heat*adj.temp;
+			adj.temp+=adj.type.heat*p.temp;
 		}else if(p.temp<adj.temp){
-			p.temp+=Physics.getHeatCapacity(this)*adj.temp;
-			adj.temp-=Physics.getHeatCapacity(adj.type)*p.temp;
+			p.temp+=this.heat*adj.temp;
+			adj.temp-=adj.type.heat*p.temp;
 		}
 	}
-	
-	/**Again, DO NOT override or mess up.*/
+
+	/** Again, DO NOT override or mess up. */
 	public void onSpawn(Particle p){
 		if(p.type==FIRE){
 			p.life=rand.nextInt(100)+300;
-			p.temp=rand.nextInt(1000)+1000.0f;
+			p.temp=rand.nextInt(25)+400.0f;
 		}else if(p.type==SMKE){
 			p.life=rand.nextInt(1000)+500;
-			p.temp=rand.nextInt(200)+100.0f;
+			p.temp=rand.nextInt(25)+100.0f;
 		}else{
 			p.temp=22.0f;
 		}
@@ -130,12 +139,12 @@ public abstract class Element{
 	}
 
 	/** Changes element of particle at x and y */
-	public static void changeType(Particle p, Element e){
+	public static void changeType(Particle p,Element e){
 		p.type=e;
 		p.extraColour=e.colour;
 		e.onSpawn(p);
 	}
-	
+
 	/** Returns element of a specific particle */
 	public static Element elementAt(int x,int y){
 		try{

@@ -22,13 +22,13 @@ package powderinjava.elements;
 import powderinjava.Particle;
 import powderinjava.State;
 
-public class WATR extends Element {
+public class WATR extends Element{
 
-	public WATR() {
-		super("WATR", State.LIQUID, 0xff0000ff, 50, false, false, false);
+	public WATR(){
+		super("WATR",State.LIQUID,0xff0000ff,50,1.0f,false,false,false);
 	}
 
-	public int update(int x, int y, Particle p) {
+	public int update(int x,int y,Particle p){
 		return 0;
 	}
 }

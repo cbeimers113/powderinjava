@@ -25,10 +25,10 @@ import powderinjava.State;
 public class STNE extends Element{
 
 	public STNE(){
-		super("STNE", State.POWDER, 0x666666, 80, false, true, false);
+		super("STNE",State.POWDER,0x666666,80,0.17f,false,true,false);
 	}
-	
-	public int update(int x, int y, Particle p){
+
+	public int update(int x,int y,Particle p){
 		return 0;
 	}
 }

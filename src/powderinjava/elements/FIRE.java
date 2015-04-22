@@ -25,9 +25,9 @@ import powderinjava.State;
 public class FIRE extends Element{
 
 	private int flameTimer=0;
-	
+
 	public FIRE(){
-		super("FIRE",State.PLASMA,0xff0000,0,false,false,false);
+		super("FIRE",State.PLASMA,0xff0000,0,0.05f,false,false,false);
 	}
 
 	public int update(int x,int y,Particle p){

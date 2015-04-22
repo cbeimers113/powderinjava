@@ -157,13 +157,18 @@ public abstract class Engine extends Canvas implements KeyListener,MouseListener
 		FontMetrics fm=g.getFontMetrics();
 		g.setColor(new Color(0x06739E));
 		g.drawString(fpsOutput,5,15);
-		String particleData="x:"+Main.powder.mx+", y:"+Main.powder.my+" Pressure: "+Main.powder.physics.pv[Main.powder.mx][Main.powder.my];
+		String particleData="x:"+Main.powder.mx+", y:"+Main.powder.my;
 		Particle p=Particle.particleAt(Main.powder.mx,Main.powder.my);
-		if(p!=null) particleData=p.type.name+", temp: "+p.temp+"\u00b0C, life: "+p.life+", "+particleData;
+		if(p!=null) particleData=p.type.name+", Temp: "+rounded(p.temp)+"\u00b0C, life: "+p.life+", "+particleData;
+		else particleData+=" Temp: "+rounded(Physics.tv[Main.powder.mx][Main.powder.my])+"\u00b0C"+" Pressure: "+rounded(Physics.pv[Main.powder.mx][Main.powder.my]);
 		g.drawString(particleData,Powder.xMarginRight()-fm.stringWidth(particleData),15);
 		refresh();
 		g.dispose();
 		bs.show();
+	}
+
+	private float rounded(float f){
+		return (float)Math.round(f*100)/100;
 	}
 
 	public BufferedImage zoom(BufferedImage originalImage){
@@ -175,6 +180,6 @@ public abstract class Engine extends Canvas implements KeyListener,MouseListener
 	}
 
 	public abstract void save();
-	
+
 	public abstract void render(Graphics g);
 }

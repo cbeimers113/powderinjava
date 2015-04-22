@@ -20,14 +20,13 @@ package powderinjava.elements;
 import powderinjava.Particle;
 import powderinjava.State;
 
-
 public class HYGN extends Element{
 
 	public HYGN(){
-		super("HYGN",State.GAS,0x0D86FF,0,true,false,false);
+		super("HYGN",State.GAS,0x0D86FF,0,3.42f,true,false,false);
 	}
-	
-	public int update(int x, int y, Particle p){
+
+	public int update(int x,int y,Particle p){
 		return 0;
 	}
 }

@@ -24,7 +24,7 @@ import powderinjava.State;
 public class SMKE extends Element{
 
 	public SMKE(){
-		super("SMKE",State.PLASMA,0x454545,0,false,false,false);
+		super("SMKE",State.PLASMA,0x454545,0,0.49f,false,false,false);
 	}
 
 	public int update(int x,int y,Particle p){
@@ -32,7 +32,7 @@ public class SMKE extends Element{
 			p.remove();
 			return 1;
 		}
-		if(p.temp>=400.0f){
+		if(p.temp>=100.0f){
 			changeType(p,FIRE);
 			return 1;
 		}

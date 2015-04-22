@@ -24,12 +24,12 @@ import powderinjava.State;
 
 public class NONE extends Element{
 
-	/**A container for erasing, to avoid NullPointerException*/
-	public NONE() {
-		super("NONE", State.SOLID, 0x00000000, 100, false, false, false);
+	/** A container for erasing, to avoid NullPointerException */
+	public NONE(){
+		super("NONE",State.SOLID,0x00000000,100,0.01f,false,false,false);
 	}
 
-	public int update(int x, int y, Particle p) {
+	public int update(int x,int y,Particle p){
 		p.remove();
 		return 0;
 	}
