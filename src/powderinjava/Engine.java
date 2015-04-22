@@ -132,7 +132,7 @@ public abstract class Engine extends Canvas implements KeyListener,MouseListener
 				rFrames=frames;
 				frames=0;
 			}
-			setFpsOutput("FPS:"+rFrames+", Parts: "+Particle.particles.size()+", "+(Main.powder.fancyGraphics?"Fancy Mode":"Normal Mode"));
+			setFpsOutput("FPS:"+rFrames+", Parts: "+Particle.particles.size()+", "+(Main.powder.fancyGraphics?"Fancy Mode":Main.powder.tempGraphics?"Temperature Mode":"Normal Mode"));
 		}
 		stop();
 	}

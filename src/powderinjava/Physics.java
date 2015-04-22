@@ -19,6 +19,8 @@
 
 package powderinjava;
 
+import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import powderinjava.elements.Element;
 
@@ -31,8 +33,6 @@ public class Physics{
 	public static float minTemp=-maxTemp;
 	public static int defaultBurnRate=50;
 
-	public BufferedImage tempView;
-	
 	public int width;
 	public int height;
 
@@ -47,27 +47,61 @@ public class Physics{
 		}
 	}
 
-	public void update(){
+	public void update(Graphics g,BufferedImage img){
 		for(int y=0;y<height;y++){
 			for(int x=0;x<width;x++){
 				// Average pressure and temperature
-				float pAv=0.0f;
-				float tAv=0.0f;
-				float success=0.0f;
-				for(int i=0;i<8;i++){
-					int ax=i==0||i==6||i==7?-1:i==1||i==5?0:1;
-					int ay=i==0||i==1||i==2?-1:i==3||i==7?0:1;
-					if(x+ax>Powder.xMarginLeft&&x+ax<Powder.xMarginRight()&&y+ay>Powder.yMarginTop&&y+ay<Powder.yMarginBottom()){
-						pAv+=pv[x+ax][y+ay];
-						tAv+=tv[x+ax][y+ay];
-						success++;
+				if(!Main.powder.paused){
+					float pAv=0.0f;
+					float tAv=0.0f;
+					float success=0.0f;
+					for(int i=0;i<8;i++){
+						int ax=i==0||i==6||i==7?-1:i==1||i==5?0:1;
+						int ay=i==0||i==1||i==2?-1:i==3||i==7?0:1;
+						if(x+ax>Powder.xMarginLeft&&x+ax<Powder.xMarginRight()&&y+ay>Powder.yMarginTop&&y+ay<Powder.yMarginBottom()){
+							pAv+=pv[x+ax][y+ay];
+							tAv+=tv[x+ax][y+ay];
+							success++;
+						}
 					}
+					pv[x][y]=pAv/success;
+					tv[x][y]=tAv/success;
+					if(tv[x][y]>maxTemp) tv[x][y]=maxTemp;
 				}
-				pv[x][y]=pAv/success;
-				tv[x][y]=tAv/success;
-				tempView.setRGB(x,y,(int)((tv[x][y]/1_000_000.0f)*255));
+				// /TODO: Pressure check
+				if(Main.powder.tempGraphics&&x>Powder.xMarginLeft&&x<Powder.xMarginRight()&&y>Powder.yMarginTop&&y<Powder.yMarginBottom()) try{
+					img.setRGB(x,y,getTempColour(tv[x][y]).getRGB());
+				}catch(IllegalArgumentException temp1){
+				}
+				// Update Particles
+				Particle p=pmap[x][y];
+				if(p==null)continue;
+				if(p.removeQueue){
+					Physics.pmap[x][y]=null;
+					continue;
+				}
+				if(Main.powder.fancyGraphics){
+					Color glow=new Color(p.extraColour.getRed(),p.extraColour.getGreen(),p.extraColour.getBlue(),p.extraColour.getAlpha());
+					if(p.type.state.equals(State.LIQUID)){
+						for(int i=0;i<4;i++){
+							int ax=i==0||i==2?0:i==1?1:-1;
+							int ay=i==0?-1:i==1||i==3?0:1;
+							img.setRGB(p.x+ax,p.y+ay,glow.getRGB());
+						}
+						img.setRGB(p.x,p.y,p.type.colour.getRGB());
+					}else if(p.type.state.equals(State.GAS)||p.type.state.equals(State.PLASMA)){
+						Color pixel=new Color(glow.getRed(),glow.getGreen(),glow.getBlue(),glow.getAlpha()/3);
+						g.setColor(pixel);
+						g.fillOval(p.x-3/2,p.y-3/2,3,3);
+					}else img.setRGB(p.x,p.y,p.type.colour.getRGB());
+				}else img.setRGB(p.x,p.y,p.type.colour.getRGB());
+				if(!Main.powder.paused) p.update();
 			}
 		}
+	}
+	
+	private Color getTempColour(float t){
+		return new Color((int)(0xff0000*(t/maxTemp)));
 	}
 
 	public void addAir(int x,int y,float pressure){

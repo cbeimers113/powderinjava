@@ -91,6 +91,7 @@ public class Particle{
 		extraColour=type.colour;
 		type.onSpawn(this);
 		tempInit=temp;
+		Physics.pmap[x][y]=this;
 		particles.add(this);
 	}
 
@@ -152,7 +153,7 @@ public class Particle{
 			if(check!=this) 
 				check.displace(rand.nextInt(2)==0?1:-1,-1);
 		}
-		if(++t%1/*((type.mass>>5)+1)*/==0){
+		if(++t%((type.mass>>5)+1)==0){
 			int px=x;
 			int py=y;
 			x+=xDest;

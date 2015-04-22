@@ -43,6 +43,7 @@ public abstract class Element{
 	public static final Element COAL=new COAL();
 	public static final Element SMKE=new SMKE();
 	public static final Element C4=new C4();
+	public static final Element PLSM=new PLSM();
 
 	public String name;
 	public State state;
@@ -128,7 +129,11 @@ public abstract class Element{
 		}else if(p.type==SMKE){
 			p.life=rand.nextInt(1000)+500;
 			p.temp=rand.nextInt(25)+100.0f;
-		}else{
+		}else if(p.type==PLSM){
+			p.life=rand.nextInt(100)+300;
+			p.temp=Physics.maxTemp;
+		}
+		else{
 			p.temp=22.0f;
 		}
 	}
