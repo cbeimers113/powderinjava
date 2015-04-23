@@ -19,12 +19,9 @@ package powderinjava.elements;
 
 import java.awt.Color;
 import powderinjava.Particle;
-import powderinjava.Physics;
 import powderinjava.State;
 
 public class FIRE extends Element{
-
-	private int flameTimer=0;
 
 	public FIRE(){
 		super("FIRE",State.PLASMA,0xff0000,0,0.05f,false,false,false);
@@ -39,12 +36,9 @@ public class FIRE extends Element{
 		if(p.temp<=100.0f){
 			changeType(p,SMKE);
 			return 1;
-		}
-		if(elementAt(x,y).flammable){
-			if(++flameTimer%Physics.getBurnRate(elementAt(x,y))==0){
-				changeType(Particle.particleAt(x,y),this);
-				return 1;
-			}
+		}else if(p.temp>=1000.0f){
+			changeType(p,PLSM);
+			return 1;
 		}
 		return 0;
 	}

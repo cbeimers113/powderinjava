@@ -67,15 +67,17 @@ public class Physics{
 					pv[x][y]=pAv/success;
 					tv[x][y]=tAv/success;
 					if(tv[x][y]>maxTemp) tv[x][y]=maxTemp;
+					if(tv[x][y]<minTemp) tv[x][y]=minTemp;
 				}
 				// /TODO: Pressure check
-				if(Main.powder.tempGraphics&&x>Powder.xMarginLeft&&x<Powder.xMarginRight()&&y>Powder.yMarginTop&&y<Powder.yMarginBottom()) try{
-					img.setRGB(x,y,getTempColour(tv[x][y]).getRGB());
-				}catch(IllegalArgumentException temp1){
+				Particle p=pmap[x][y];
+				if(!Main.powder.paused&&p!=null) p.update();
+				if(Main.powder.tempGraphics&&x>Powder.xMarginLeft&&x<Powder.xMarginRight()&&y>Powder.yMarginTop&&y<Powder.yMarginBottom()){
+					boolean ambient=p==null;
+					img.setRGB(x,y,getTempColour(ambient?tv[x][y]:p.temp).getRGB());
 				}
 				// Update Particles
-				Particle p=pmap[x][y];
-				if(p==null)continue;
+				if(p==null) continue;
 				if(p.removeQueue){
 					Physics.pmap[x][y]=null;
 					continue;
@@ -94,21 +96,25 @@ public class Physics{
 						g.setColor(pixel);
 						g.fillOval(p.x-3/2,p.y-3/2,3,3);
 					}else img.setRGB(p.x,p.y,p.type.colour.getRGB());
-				}else img.setRGB(p.x,p.y,p.type.colour.getRGB());
-				if(!Main.powder.paused) p.update();
+				}
+				if(!Main.powder.fancyGraphics&&!Main.powder.tempGraphics) img.setRGB(p.x,p.y,p.type.colour.getRGB());
 			}
 		}
 	}
-	
+
 	private Color getTempColour(float t){
-		return new Color((int)(0xff0000*(t/maxTemp)));
+		try{
+			return new Color(MapData.heatMap[(int)(t*(MapData.heatMap.length-1)/maxTemp)]);
+		}catch(ArrayIndexOutOfBoundsException e){
+			return new Color(MapData.heatMap[MapData.heatMap.length-1]);
+		}
 	}
 
 	public void addAir(int x,int y,float pressure){
 		pv[x][y]+=pressure;
 	}
 
-	public static int getBurnRate(Element e){
+	public static int getBurnRate(Element e) throws Exception{
 		if(!e.flammable) return 0;
 		if(e==Element.OXGN||e==Element.HYGN){
 			return 10;
@@ -119,7 +125,7 @@ public class Physics{
 		}else if(e==Element.C4){
 			return 1;
 		}else{
-			return defaultBurnRate;
+			throw new Exception("You forgot to specify the burn rate of some flammable elements!");
 		}
 	}
 }

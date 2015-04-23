@@ -22,14 +22,12 @@ import powderinjava.State;
 public class C4 extends Element{
 
 	public C4(){
-		super("C4",State.SOLID,0xff00c3,100,1.67f,true,false,false);
+		super("C4",State.SOLID,0xff00c3,100,0.67f,true,false,false);
 	}
 
 	public int update(int x,int y,Particle p){
-		if(elementAt(x,y)==FIRE){
-			changeType(p,FIRE);
-			return 1;
-		}
+		if(elementAt(x,y)==FIRE||elementAt(x,y)==PLSM)
+			p.burning=true;
 		return 0;
 	}
 }

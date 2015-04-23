@@ -106,6 +106,7 @@ public class Powder extends Engine{
 	}
 
 	public void keyPressed(KeyEvent e){
+		welcomeTimer=welcomeWait;
 		switch(e.getKeyCode()){
 			case KeyEvent.VK_SPACE:
 				paused=!paused;
@@ -151,6 +152,7 @@ public class Powder extends Engine{
 	}
 
 	public void mousePressed(MouseEvent e){
+		welcomeTimer=welcomeWait;
 		if(e.getButton()==MouseEvent.BUTTON1){
 			spawning=true;
 			erasing=false;

@@ -41,14 +41,16 @@ public class Particle{
 	private int t;
 	public int x;
 	public int y;
+	public int life;
+	public int combust;
+
 	public float vx;
 	public float vy;
-	public int life;
-
 	public float tempInit;
 	public float temp;
 
 	public boolean removeQueue;
+	public boolean burning;
 
 	public Particle(int x,int y,Element type,Element...ctype){
 		this.x=x;
@@ -116,13 +118,21 @@ public class Particle{
 				displace((int)(vx*(rand.nextInt(3)-1)),(int)(vy*(rand.nextInt(2)+1)));
 				vx=rand.nextInt(3)-1;
 				vy=rand.nextInt(2)-2;
+				break;
 			default:
 				break;
 		}
+		if(temp>Physics.maxTemp)temp=Physics.maxTemp;
+		if(temp<Physics.minTemp)temp=Physics.minTemp;
 		for(int i=0;i<8;i++){
 			int ax=i<3?x-1:i<4?x:x+1;
 			int ay=i==0||i==3||i==5?y+1:i==1||i==6?y:y-1;
-			type.doPhysics(ax,ay,this);
+			try{
+				type.doPhysics(ax,ay,this);
+			}catch(Exception e){
+				e.printStackTrace();
+				System.exit(1);
+			}
 			if(type.update(ax,ay,this)==1) break;
 		}
 		if(x<Powder.xMarginLeft||y<Powder.yMarginTop||x>Powder.xMarginRight()||y>Powder.yMarginBottom()||type.equals(Element.NONE))

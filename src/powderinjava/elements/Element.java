@@ -51,7 +51,7 @@ public abstract class Element{
 	protected Random rand;
 
 	public int mass;
-	
+
 	public float heat;
 
 	public boolean flammable;
@@ -99,25 +99,62 @@ public abstract class Element{
 	 */
 	public abstract int update(int x,int y,Particle p);
 
-	/** DO NOT OVERRIDE unless you are an idiot or you have an excellent reason. */
-	public void doPhysics(int x,int y,Particle p){
+	/**
+	 * DO NOT OVERRIDE unless you are an idiot or you have an excellent reason.
+	 * 
+	 * @throws Exception
+	 */
+	public void doPhysics(int x,int y,Particle p) throws Exception{
 		Particle adj=Particle.particleAt(x,y);
+		float delta;
+		float transfer=rand.nextFloat();
+		boolean transferPart;
+		boolean transferAdj;
 		if(adj==null){
-			if(p.temp>Physics.tv[x][y]){
-				if(p.temp>Physics.minTemp)p.temp-=this.heat*Physics.tv[x][y];
-				if(Physics.tv[x][y]<Physics.maxTemp)Physics.tv[x][y]+=NONE.heat*p.temp;
-			}else if(p.temp<Physics.tv[x][y]){
-				if(p.temp<Physics.maxTemp)p.temp+=this.heat*Physics.tv[x][y];
-				if(Physics.tv[x][y]>Physics.minTemp)Physics.tv[x][y]-=NONE.heat*p.temp;
+			transferPart=transfer<=heat;
+			transferAdj=transfer<=Element.NONE.heat;
+			delta=Physics.tv[x][y]-p.temp;
+			if(delta<0) delta=-delta;
+			if(p.temp<Physics.tv[x][y]){
+				if(transferPart) p.temp+=delta;
+				if(transferAdj) Physics.tv[x][y]-=delta;
+			}else if(p.temp>Physics.tv[x][y]){
+				if(transferPart) p.temp-=delta;
+				if(transferAdj) Physics.tv[x][y]+=delta;
 			}
-			return;
+		}else{
+			transferPart=transfer<=heat;
+			transferAdj=transfer<=adj.type.heat;
+			delta=adj.temp-p.temp;
+			if(delta<0) delta=-delta;
+			if(p.temp<adj.temp){
+				if(transferPart) p.temp+=delta;
+				if(transferAdj) adj.temp-=delta;
+			}else if(p.temp>adj.temp){
+				if(transferPart) p.temp-=delta;
+				if(transferAdj) adj.temp+=delta;
+			}
 		}
-		if(p.temp>adj.temp){
-			p.temp-=this.heat*adj.temp;
-			adj.temp+=adj.type.heat*p.temp;
-		}else if(p.temp<adj.temp){
-			p.temp+=this.heat*adj.temp;
-			adj.temp-=adj.type.heat*p.temp;
+		if(flammable){
+			if(!p.burning){
+				float ignition;
+				if(this==WOOD)
+					ignition=150.0f;
+				else if(this==COAL)
+					ignition=349.0f;
+				else if(this==OXGN||this==HYGN)
+					ignition=500.0f;
+				else if(this==C4)
+					ignition=Physics.maxTemp;
+				else throw new Exception("You forgot to specify autoignition temperature of some flammable elements!");
+				if(p.temp>=ignition&&++p.combust%Physics.getBurnRate(this)==0) p.burning=true;
+			}else{
+				if(++p.combust%Physics.getBurnRate(this)==0){
+					changeType(p,FIRE);
+					p.combust=0;
+					return;
+				}
+			}
 		}
 	}
 
@@ -132,8 +169,7 @@ public abstract class Element{
 		}else if(p.type==PLSM){
 			p.life=rand.nextInt(100)+300;
 			p.temp=Physics.maxTemp;
-		}
-		else{
+		}else{
 			p.temp=22.0f;
 		}
 	}

@@ -26,7 +26,7 @@ public class NONE extends Element{
 
 	/** A container for erasing, to avoid NullPointerException */
 	public NONE(){
-		super("NONE",State.SOLID,0x00000000,100,0.01f,false,false,false);
+		super("NONE",State.SOLID,0x00000000,100,0.1f,false,false,false);
 	}
 
 	public int update(int x,int y,Particle p){

@@ -44,6 +44,9 @@ import javax.swing.JFrame;
 public abstract class Engine extends Canvas implements KeyListener,MouseListener,MouseMotionListener,MouseWheelListener,Runnable{
 
 	public static final long serialVersionUID=1L;
+	private static String[] welcomeMessage=new String[]{
+			"Welcome to Powder In Java!","This is a project by firefreak11, author of the Unrealistic Science Mod Series!","Click to spawn elements into the simulation and watch them interact!","Press \"G\" to cycle through graphics modes!"
+	};
 
 	public JFrame frame;
 	public String title;
@@ -51,6 +54,8 @@ public abstract class Engine extends Canvas implements KeyListener,MouseListener
 	public BufferedImage img;
 	public String fpsOutput;
 
+	protected int welcomeTimer;
+	protected int welcomeWait;
 	public int width;
 	public int height;
 	public int[] pixels;
@@ -66,6 +71,7 @@ public abstract class Engine extends Canvas implements KeyListener,MouseListener
 		this.resizable=resizable;
 		this.fullscreen=fullscreen;
 		fpsOutput="";
+		welcomeWait=300;
 		initialize();
 	}
 
@@ -153,13 +159,22 @@ public abstract class Engine extends Canvas implements KeyListener,MouseListener
 		Main.powder.menu.render(g);
 		render(g);
 		g.drawImage(img,0,0,null);
+		FontMetrics fm;
+		g.setFont(new Font("Arial",0,14));
+		fm=g.getFontMetrics();
+		g.setColor(new Color(0xffcd34));
+		if(++welcomeTimer<welcomeWait){
+			for(int i=0;i<welcomeMessage.length;i++)
+				g.drawString(welcomeMessage[i],getWidth()/2-fm.stringWidth(welcomeMessage[i])/2,40+20*i);
+		}
 		g.setFont(new Font("Arial",0,10));
-		FontMetrics fm=g.getFontMetrics();
+		fm=g.getFontMetrics();
 		g.setColor(new Color(0x06739E));
-		g.drawString(fpsOutput,5,15);
+		g.drawString(fpsOutput,Powder.xMarginLeft,15);
 		String particleData="x:"+Main.powder.mx+", y:"+Main.powder.my;
 		Particle p=Particle.particleAt(Main.powder.mx,Main.powder.my);
-		if(p!=null) particleData=p.type.name+", Temp: "+rounded(p.temp)+"\u00b0C, life: "+p.life+", "+particleData;
+		if(p!=null)
+			particleData=p.type.name+", Temp: "+rounded(p.temp)+"\u00b0C, life: "+p.life+", "+particleData;
 		else particleData+=" Temp: "+rounded(Physics.tv[Main.powder.mx][Main.powder.my])+"\u00b0C"+" Pressure: "+rounded(Physics.pv[Main.powder.mx][Main.powder.my]);
 		g.drawString(particleData,Powder.xMarginRight()-fm.stringWidth(particleData),15);
 		refresh();
