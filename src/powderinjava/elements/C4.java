@@ -19,16 +19,16 @@ package powderinjava.elements;
 
 import powderinjava.Particle;
 import powderinjava.State;
-import powderinjava.StaticData;
+import powderinjava.Powder;
 
 public class C4 extends Element{
 
 	public C4(){
-		super("C4",State.SOLID,0xff00c3,100,0.67f,true,true);
+		super(C4.class,State.SOLID,0xff00c3,100,0.67f,true,true,"C4 plastic explosive. Detonates at high temperatures and pressures.");
 	}
 
 	public int update(int x,int y,Particle p){
-		if(elementAt(x,y)==FIRE||elementAt(x,y)==PLSM||StaticData.pv[x][y]>=200.0f)
+		if(elementAt(x,y)==FIRE||elementAt(x,y)==PLSM||Powder.pv[x][y]>=200.0f)
 			p.burning=true;
 		return 0;
 	}

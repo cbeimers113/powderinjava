@@ -26,7 +26,7 @@ import powderinjava.State;
 public class WTRV extends Element{
 
 	public WTRV(){
-		super("WTRV",State.GAS,0x3700ff,0,0.01f,false,false);
+		super(WTRV.class,State.GAS,0x3700ff,0,0.01f,false,false,"Water vapor.");
 	}
 
 	public int update(int x,int y,Particle p){

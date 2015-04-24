@@ -20,8 +20,6 @@
 package powderinjava;
 
 import java.awt.Color;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 import powderinjava.elements.Element;
 
@@ -30,8 +28,6 @@ import powderinjava.elements.Element;
  */
 
 public class Particle{
-
-	public static List<Particle> particles=new ArrayList<Particle>();
 	
 	public Element type;
 	public Element ctype;
@@ -89,8 +85,7 @@ public class Particle{
 		extraColour=type.colour;
 		type.onSpawn(this);
 		tempInit=temp;
-		StaticData.pmap[x][y]=this;
-		particles.add(this);
+		Powder.pmap[x][y]=this;
 	}
 
 	public synchronized void update(){
@@ -113,10 +108,10 @@ public class Particle{
 			default:
 				break;
 		}
-		if(temp>Physics.maxTemp)temp=Physics.maxTemp;
-		if(temp<Physics.minTemp)temp=Physics.minTemp;
+		if(temp>Powder.maxTemp)temp=Powder.maxTemp;
+		if(temp<Powder.minTemp)temp=Powder.minTemp;
 		try{
-			if(StaticData.tv[x][y-1]<temp&&type.mass<=5)displace(0,-1);
+			if(Powder.tv[x][y-1]<temp&&type.mass<=5)displace(0,-1);
 		}catch(ArrayIndexOutOfBoundsException e){}
 		for(int i=0;i<8;i++){
 			int ax=i<3?x-1:i<4?x:x+1;
@@ -129,15 +124,15 @@ public class Particle{
 			}
 			if(type.update(ax,ay,this)==1) break;
 		}
-		if(x<Powder.xMarginLeft||y<Powder.yMarginTop||x>Powder.xMarginRight()||y>Powder.yMarginBottom()||type.equals(Element.NONE))
+		if(x<Powder.xMarginLeft||y<Powder.yMarginTop||x>Powder.xMarginRight||y>Powder.yMarginBottom||type.equals(Element.NONE))
 			remove();
 		else{
-			if(StaticData.pmap[x][y]==null) StaticData.pmap[x][y]=this;
+			if(Powder.pmap[x][y]==null) Powder.pmap[x][y]=this;
 		}
 	}
 
 	public void displace(int xDest,int yDest){
-		if(x+xDest==Powder.xMarginLeft||y+yDest==Powder.yMarginTop||x+xDest==Powder.xMarginRight()||y+yDest==Powder.yMarginBottom()){// Collide with the borders
+		if(x+xDest==Powder.xMarginLeft||y+yDest==Powder.yMarginTop||x+xDest==Powder.xMarginRight||y+yDest==Powder.yMarginBottom){// Collide with the borders
 			return;
 		}
 		Particle check=particleAt(x+xDest,y+yDest);
@@ -160,18 +155,18 @@ public class Particle{
 		if(++t%((type.mass>>5)+1)==0){
 			int px=x;
 			int py=y;
-			x+=xDest+(int)StaticData.vx[px][py];
-			y+=yDest+(int)StaticData.vy[px][py];
-			StaticData.pmap[px][py]=null;
+			x+=xDest+Powder.vx[px][py];
+			y+=yDest+Powder.vy[px][py];
+			Powder.pmap[px][py]=null;
 			t=0;
-			if(x<Powder.xMarginLeft||y<Powder.yMarginTop||x>Powder.xMarginRight()||y>Powder.yMarginBottom()||type.equals(Element.NONE))
+			if(x<Powder.xMarginLeft||y<Powder.yMarginTop||x>Powder.xMarginRight||y>Powder.yMarginBottom||type.equals(Element.NONE))
 				remove();
 		}
 	}
 
 	public static Particle particleAt(int x,int y){
 		try{
-			return StaticData.pmap[x][y];
+			return Powder.pmap[x][y];
 		}catch(ArrayIndexOutOfBoundsException e){
 			return null;
 		}

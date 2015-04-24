@@ -25,11 +25,11 @@ import powderinjava.State;
 public class OXGN extends Element{
 
 	public OXGN(){
-		super("OXGN",State.GAS,0x7FE5D7,0,3.42f,true,false);
+		super(OXGN.class,State.GAS,0x7FE5D7,0,3.42f,true,false,"Oxygen. Creates water with hydrogen.");
 	}
 
 	public int update(int x,int y,Particle p){
-		if(elementAt(x,y)==HYGN){
+		if(elementAt(x,y)==HYGN&&(p.temp+Particle.particleAt(x,y).temp)/2>=400.0f){
 			changeType(p,WATR);
 			changeType(Particle.particleAt(x,y),NONE);
 			return 1;

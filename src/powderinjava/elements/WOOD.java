@@ -24,7 +24,7 @@ import powderinjava.State;
 public class WOOD extends Element{
 
 	public WOOD(){
-		super("WOOD",State.SOLID,0xD99B38,100,0.41f,true,false);
+		super(WOOD.class,State.SOLID,0xD99B38,100,0.41f,true,false,"Wood.");
 	}
 
 	public int update(int x,int y,Particle p){

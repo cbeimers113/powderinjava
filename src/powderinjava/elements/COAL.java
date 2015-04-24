@@ -23,7 +23,7 @@ import powderinjava.State;
 public class COAL extends Element{
 
 	public COAL(){
-		super("COAL",State.SOLID,0x222222,100,0.17f,true,false);
+		super(COAL.class,State.SOLID,0x222222,100,0.17f,true,false,"Coal. Burns slowly.");
 	}
 
 	public int update(int x,int y,Particle p){

@@ -24,7 +24,7 @@ import powderinjava.State;
 public class SMKE extends Element{
 
 	public SMKE(){
-		super("SMKE",State.GAS,0x454545,0,0.49f,false,false);
+		super(SMKE.class,State.GAS,0x454545,0,0.49f,false,false,"Smoke. Fumes from cooled fire.");
 	}
 
 	public int update(int x,int y,Particle p){

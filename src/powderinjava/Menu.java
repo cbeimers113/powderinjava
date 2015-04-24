@@ -17,12 +17,12 @@
 
 package powderinjava;
 
-import static powderinjava.StaticData.pause;
-import static powderinjava.StaticData.play;
-import static powderinjava.StaticData.page;
-import static powderinjava.StaticData.pauseH;
-import static powderinjava.StaticData.playH;
-import static powderinjava.StaticData.pageH;
+import static powderinjava.Powder.page;
+import static powderinjava.Powder.pageH;
+import static powderinjava.Powder.pause;
+import static powderinjava.Powder.pauseH;
+import static powderinjava.Powder.play;
+import static powderinjava.Powder.playH;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -37,26 +37,28 @@ public class Menu{
 	private static int[] drawPImageAt;
 	private static int[] drawNewAt;
 
-	public List<Element> liquids;
-	public List<Element> gasses;
-	public List<Element> powders;
-	public List<Element> solids;
-	public List<Element> hidden;
-	public List<Element> quantum;
+	public static List<Element> liquids;
+	public static List<Element> gasses;
+	public static List<Element> powders;
+	public static List<Element> solids;
+	public static List<Element> hidden;
+	public static List<Element> quantum;
+	
+	private static Color hover;
 
-	private int menu;
-	private int x;
-	private int y;
-	private int elSize;
-	private int elHeight;
-	private int MLIQUIDS;
-	private int MGASSES;
-	private int MPOWDERS;
-	private int MSOLIDS;
-	private int MHIDDEN;
-	private int MQUANTUM;
+	private static int menu;
+	private static int x;
+	private static int y;
+	private static int elSize;
+	private static int elHeight;
+	private static int MLIQUIDS;
+	private static int MGASSES;
+	private static int MPOWDERS;
+	private static int MSOLIDS;
+	private static int MHIDDEN;
+	private static int MQUANTUM;
 
-	public boolean b;
+	public static boolean b;
 
 	public Menu(){
 		liquids=new ArrayList<Element>();
@@ -74,12 +76,13 @@ public class Menu{
 		elSize=35;
 		elHeight=10;
 		menu=MLIQUIDS;
+		hover=new Color(0x22,0x22,0x22,100);
 	}
 
 	public void grabMouse(int x,int y,boolean b){
-		this.x=x;
-		this.y=y;
-		this.b=b;
+		Menu.x=x;
+		Menu.y=y;
+		Menu.b=b;
 	}
 
 	public static Color getContrastColor(Color color){
@@ -89,41 +92,47 @@ public class Menu{
 
 	public void render(Graphics g){
 		g.setColor(Color.white);
-		g.drawLine(Powder.xMarginLeft,Powder.yMarginBottom(),Powder.xMarginRight(),Powder.yMarginBottom());
-		g.drawLine(Powder.xMarginLeft,Powder.yMarginBottom(),Powder.xMarginLeft,Powder.yMarginTop);
-		g.drawLine(Powder.xMarginLeft,Powder.yMarginTop,Powder.xMarginRight(),Powder.yMarginTop);
-		g.drawLine(Powder.xMarginRight(),Powder.yMarginTop,Powder.xMarginRight(),Powder.yMarginBottom());
+		g.drawLine(Powder.xMarginLeft,Powder.yMarginBottom,Powder.xMarginRight,Powder.yMarginBottom);
+		g.drawLine(Powder.xMarginLeft,Powder.yMarginBottom,Powder.xMarginLeft,Powder.yMarginTop);
+		g.drawLine(Powder.xMarginLeft,Powder.yMarginTop,Powder.xMarginRight,Powder.yMarginTop);
+		g.drawLine(Powder.xMarginRight,Powder.yMarginTop,Powder.xMarginRight,Powder.yMarginBottom);
 		g.setFont(new Font("Arial",1,9));
 		FontMetrics fm=g.getFontMetrics();
 		List<Element> list=toScan();
 		for(Element e:list){
-			int x=Powder.xMarginRight()-(1+list.indexOf(e))*(elSize+2);
-			int y=30*Main.powder.height/32-elHeight-1;
+			int x=Powder.xMarginRight-(1+list.indexOf(e))*(elSize+2);
+			int y=30*Powder.HEIGHT/32-elHeight-1;
 			g.setColor(e.colour);
 			g.fillRect(x,y,elSize,elHeight);
 			g.setColor(getContrastColor(e.colour));
 			g.drawString(e.name,x+elSize/2-fm.stringWidth(e.name)/2,y+elHeight-1);
-			g.setColor(e.equals(Main.powder.spawnType)?Color.green:Color.white);
+			if(Menu.x>=x&&Menu.y>=y&&Menu.x<=x+elSize&&Menu.y<=y+elHeight){
+				g.setColor(hover);
+				g.fillRect(x,y,elSize,elHeight);
+				g.setColor(Powder.text);
+				g.drawString(e.desc,Powder.xMarginRight-5-fm.stringWidth(e.desc),Powder.yMarginBottom-5);
+				if(b)Powder.spawnType=e;
+			}
+			g.setColor(e.equals(Powder.spawnType)?Color.green:Color.white);
 			g.drawRect(x,y,elSize,elHeight);
-			if(b&&this.x>=x&&this.y>=y&&this.x<=x+elSize&&this.y<=y+elHeight) Main.powder.spawnType=e;
 		}
-		g.setColor(new Color(0x06739E));
-		BufferedImage pImage=Main.powder.paused?play:pause;
+		g.setColor(Powder.text);
+		BufferedImage pImage=Powder.paused?play:pause;
 		drawPImageAt=new int[]{
-				Powder.xMarginRight()-5-pImage.getWidth(),
-				Powder.yMarginBottom()+4
+				Powder.xMarginRight-5-pImage.getWidth(),
+				Powder.yMarginBottom+4
 		};
 		drawNewAt=new int[]{
-				Powder.xMarginRight()-5-page.getWidth(),
-				Powder.yMarginBottom()+8+page.getHeight()
+				Powder.xMarginRight-5-page.getWidth(),
+				Powder.yMarginBottom+8+page.getHeight()
 		};
 		if(x>=drawPImageAt[0]&&x<=drawPImageAt[0]+pImage.getWidth()&&y>=drawPImageAt[1]&&y<=drawPImageAt[1]+pImage.getHeight()){
-			pImage=Main.powder.paused?playH:pauseH;
+			pImage=Powder.paused?playH:pauseH;
 			g.drawImage(pImage,drawPImageAt[0],drawPImageAt[1],null);
-			String pMsg=(Main.powder.paused?"Plays":"Pauses")+" the simulation.";
-			g.drawString(pMsg,Powder.xMarginRight()-5-fm.stringWidth(pMsg),Powder.yMarginBottom()-5);
+			String pMsg=(Powder.paused?"Plays":"Pauses")+" the simulation.";
+			g.drawString(pMsg,Powder.xMarginRight-5-fm.stringWidth(pMsg),Powder.yMarginBottom-5);
 			if(b){
-				Main.powder.paused=!Main.powder.paused;
+				Powder.paused=!Powder.paused;
 				b=false;
 			}
 		}else{
@@ -132,9 +141,9 @@ public class Menu{
 		if(x>=drawNewAt[0]&&x<=drawNewAt[0]+page.getWidth()&&y>=drawNewAt[1]&&y<=drawNewAt[1]+page.getHeight()){
 			g.drawImage(pageH,drawNewAt[0],drawNewAt[1],null);
 			String nMsg="Starts a new simulation.";
-			g.drawString(nMsg,Powder.xMarginRight()-5-fm.stringWidth(nMsg),Powder.yMarginBottom()-5);
+			g.drawString(nMsg,Powder.xMarginRight-5-fm.stringWidth(nMsg),Powder.yMarginBottom-5);
 			if(b){
-				Main.powder.newSim();
+				Powder.newSim();
 				b=false;
 			}
 		}else{

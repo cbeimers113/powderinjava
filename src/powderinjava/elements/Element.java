@@ -19,14 +19,16 @@
 
 package powderinjava.elements;
 
+import static powderinjava.Powder.pv;
+import static powderinjava.Powder.tv;
+import static powderinjava.Powder.maxTemp;
+import static powderinjava.Powder.getBurnRate;
 import java.awt.Color;
 import java.util.Random;
-import powderinjava.Main;
+import powderinjava.Menu;
 import powderinjava.Particle;
-import powderinjava.Physics;
+import powderinjava.Powder;
 import powderinjava.State;
-import static powderinjava.StaticData.*;
-import static powderinjava.Physics.*;
 
 /**
  * An Element Type, defines elemental behaviour
@@ -47,8 +49,11 @@ public abstract class Element{
 	public static final Element SMKE=new SMKE();
 	public static final Element C4=new C4();
 	public static final Element PLSM=new PLSM();
+	public static final Element VENT=new VENT();
+	public static final Element VACU=new VACU();
 
 	public String name;
+	public String desc;
 	public State state;
 	public Color colour;
 	protected Random rand;
@@ -61,7 +66,8 @@ public abstract class Element{
 	public boolean stacks;
 	private boolean exp;
 
-	public Element(String name,State state,int colour,int mass,float heat,boolean flammable,boolean exp){
+	public Element(Class<?>sClass,State state,int colour,int mass,float heat,boolean flammable,boolean exp,String desc){
+		String name=sClass.getSimpleName();
 		try{
 			this.name=name.substring(0,4);
 		}catch(StringIndexOutOfBoundsException fourChar){
@@ -85,11 +91,12 @@ public abstract class Element{
 		this.heat=heat;
 		this.flammable=flammable;
 		this.exp=flammable&exp;
+		this.desc=desc;
 		/*
 		 * switch(state){ case SOLID: Main.powder.menu.solids.add(this); break; case LIQUID: Main.powder.menu.liquids.add(this); break; case GAS: Main.powder.menu.gasses.add(this); break; case POWDER: Main.powder.menu.powders.add(this); break; case SPECIAL: Main.powder.menu.hidden.add(this); break; case QUANTUM: Main.powder.menu.quantum.add(this); break; }
 		 */
 		rand=new Random();
-		Main.powder.menu.liquids.add(this);
+		Menu.liquids.add(this);
 	}
 
 	/**
@@ -155,17 +162,17 @@ public abstract class Element{
 					ignition=500.0f;
 					heatPres=0.25f;
 				}else if(this==C4){
-					ignition=Physics.maxTemp;
+					ignition=maxTemp;
 					heatPres=0.5f;
 				}else throw new Exception("You forgot to specify combustion data of some flammable elements!");
-				if(p.temp>=ignition&&++p.combust%Physics.getBurnRate(this)==0) p.burning=true;
+				if(p.temp>=ignition&&++p.combust%getBurnRate(this)==0) p.burning=true;
 			}else{
-				if(++p.combust%Physics.getBurnRate(this)==0){
+				if(++p.combust%getBurnRate(this)==0){
 					changeType(p,FIRE);
 					if(exp){
-						pv[x][y]+=p.temp/(heatPres*maxTemp);
+						pv[p.x][p.y]+=p.temp/(heatPres*maxTemp);
 						for(int i=0;i<rand.nextInt(50*((int)(heatPres*10)+1));i++){
-							createPart(x+rand.nextInt(25)-25,y+rand.nextInt(25)-25,FIRE);
+							createPart(p.x+rand.nextInt(50)-25,p.y+rand.nextInt(50)-25,FIRE);
 						}
 					}
 					p.combust=0;
@@ -185,7 +192,7 @@ public abstract class Element{
 			p.temp=rand.nextInt(25)+100.0f;
 		}else if(p.type==PLSM){
 			p.life=rand.nextInt(100)+300;
-			p.temp=Physics.maxTemp;
+			p.temp=maxTemp;
 		}else if(p.type==WTRV){
 			p.temp=rand.nextInt(50)+100;
 		}
@@ -196,7 +203,7 @@ public abstract class Element{
 
 	/** Makes a particle with element e at x and y */
 	public static void createPart(int x,int y,Element e){
-		if(Particle.particleAt(x,y)==null) Main.powder.spawnParticle(x,y,e);
+		if(Particle.particleAt(x,y)==null) Powder.spawnParticle(x,y,e);
 	}
 
 	/** Changes element of particle at x and y */

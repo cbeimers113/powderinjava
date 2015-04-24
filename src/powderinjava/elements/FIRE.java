@@ -24,7 +24,7 @@ import powderinjava.State;
 public class FIRE extends Element{
 
 	public FIRE(){
-		super("FIRE",State.GAS,0xff0000,0,0.05f,false,false);
+		super(FIRE.class,State.GAS,0xff0000,0,0.05f,false,false,"Fire. Burns flammable elements and heats air.");
 	}
 
 	public int update(int x,int y,Particle p){

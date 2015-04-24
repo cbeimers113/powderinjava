@@ -25,7 +25,7 @@ import powderinjava.State;
 public class WATR extends Element{
 
 	public WATR(){
-		super("WATR",State.LIQUID,0xff0000ff,50,1.0f,false,false);
+		super(WATR.class,State.LIQUID,0xff0000ff,50,1.0f,false,false,"Water. Boils at 100.0\u00b0C");
 	}
 
 	public int update(int x,int y,Particle p){

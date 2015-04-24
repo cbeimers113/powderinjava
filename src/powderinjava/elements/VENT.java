@@ -20,16 +20,18 @@
 package powderinjava.elements;
 
 import powderinjava.Particle;
+import powderinjava.Powder;
 import powderinjava.State;
 
 
-public class PLSM extends Element{
+public class VENT extends Element{
 
-	public PLSM(){
-		super(PLSM.class,State.GAS,0xc636ff,0,0.05f,false,false,"Plasma. Extremely hot.");
+	public VENT(){
+		super(VENT.class,State.SOLID,0xffffff,100,0.2f,false,false,"Vent. Increases surrounding air pressure.");
 	}
 
 	public int update(int x,int y,Particle p){
+		Powder.pv[p.x][p.y]+=Powder.presConst*p.temp;
 		return 0;
 	}
 }

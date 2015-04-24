@@ -24,7 +24,7 @@ import powderinjava.State;
 public class SALT extends Element{
 
 	public SALT(){
-		super("SALT",State.POWDER,0xffffff,50,0.21f,false,false);
+		super(SALT.class,State.POWDER,0xffffff,50,0.21f,false,false,"Salt.");
 	}
 	
 	public int update(int x,int y,Particle p){
