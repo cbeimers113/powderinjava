@@ -85,15 +85,11 @@ public class Particle{
 				vx=rand.nextInt(2)==0?1:-1;
 				vy=rand.nextInt(2)==0?1:-1;
 				break;
-			case PLASMA:
-				vx=rand.nextInt(3)-1;
-				vy=rand.nextInt(2)-1;
-				break;
 		}
 		extraColour=type.colour;
 		type.onSpawn(this);
 		tempInit=temp;
-		Physics.pmap[x][y]=this;
+		StaticData.pmap[x][y]=this;
 		particles.add(this);
 	}
 
@@ -114,16 +110,14 @@ public class Particle{
 			case QUANTUM:
 				displace((int)vx,(int)vy);
 				break;
-			case PLASMA:
-				displace((int)(vx*(rand.nextInt(3)-1)),(int)(vy*(rand.nextInt(2)+1)));
-				vx=rand.nextInt(3)-1;
-				vy=rand.nextInt(2)-2;
-				break;
 			default:
 				break;
 		}
 		if(temp>Physics.maxTemp)temp=Physics.maxTemp;
 		if(temp<Physics.minTemp)temp=Physics.minTemp;
+		try{
+			if(StaticData.tv[x][y-1]<temp&&type.mass<=5)displace(0,-1);
+		}catch(ArrayIndexOutOfBoundsException e){}
 		for(int i=0;i<8;i++){
 			int ax=i<3?x-1:i<4?x:x+1;
 			int ay=i==0||i==3||i==5?y+1:i==1||i==6?y:y-1;
@@ -138,7 +132,7 @@ public class Particle{
 		if(x<Powder.xMarginLeft||y<Powder.yMarginTop||x>Powder.xMarginRight()||y>Powder.yMarginBottom()||type.equals(Element.NONE))
 			remove();
 		else{
-			if(Physics.pmap[x][y]==null) Physics.pmap[x][y]=this;
+			if(StaticData.pmap[x][y]==null) StaticData.pmap[x][y]=this;
 		}
 	}
 
@@ -166,15 +160,21 @@ public class Particle{
 		if(++t%((type.mass>>5)+1)==0){
 			int px=x;
 			int py=y;
-			x+=xDest;
-			y+=yDest;
-			Physics.pmap[px][py]=null;
+			x+=xDest+(int)StaticData.vx[px][py];
+			y+=yDest+(int)StaticData.vy[px][py];
+			StaticData.pmap[px][py]=null;
 			t=0;
+			if(x<Powder.xMarginLeft||y<Powder.yMarginTop||x>Powder.xMarginRight()||y>Powder.yMarginBottom()||type.equals(Element.NONE))
+				remove();
 		}
 	}
 
 	public static Particle particleAt(int x,int y){
-		return Physics.pmap[x][y];
+		try{
+			return StaticData.pmap[x][y];
+		}catch(ArrayIndexOutOfBoundsException e){
+			return null;
+		}
 	}
 
 	public void remove(){

@@ -24,7 +24,7 @@ import powderinjava.State;
 public class FIRE extends Element{
 
 	public FIRE(){
-		super("FIRE",State.PLASMA,0xff0000,0,0.05f,false,false,false);
+		super("FIRE",State.GAS,0xff0000,0,0.05f,false,false);
 	}
 
 	public int update(int x,int y,Particle p){
@@ -32,6 +32,10 @@ public class FIRE extends Element{
 			p.extraColour=new Color(255,(int)(p.temp/p.tempInit)*255,0,colour.getAlpha());
 		}catch(IllegalArgumentException e){
 			p.extraColour=colour;
+		}
+		if(elementAt(x,y)==WATR||elementAt(x,y)==WTRV){
+			changeType(p,SMKE);
+			return 1;
 		}
 		if(p.temp<=100.0f){
 			changeType(p,SMKE);

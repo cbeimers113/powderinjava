@@ -22,15 +22,18 @@ package powderinjava.elements;
 import powderinjava.Particle;
 import powderinjava.State;
 
-public class NONE extends Element{
 
-	/** A container for erasing, to avoid NullPointerException */
-	public NONE(){
-		super("NONE",State.SOLID,0x00000000,100,0.1f,false,false);
+public class WTRV extends Element{
+
+	public WTRV(){
+		super("WTRV",State.GAS,0x3700ff,0,0.01f,false,false);
 	}
 
 	public int update(int x,int y,Particle p){
-		p.remove();
+		if(p.temp<100.0f){
+			changeType(p,WATR);
+			return 1;
+		}
 		return 0;
 	}
 }

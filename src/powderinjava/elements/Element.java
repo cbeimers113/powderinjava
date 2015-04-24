@@ -25,6 +25,8 @@ import powderinjava.Main;
 import powderinjava.Particle;
 import powderinjava.Physics;
 import powderinjava.State;
+import static powderinjava.StaticData.*;
+import static powderinjava.Physics.*;
 
 /**
  * An Element Type, defines elemental behaviour
@@ -39,6 +41,7 @@ public abstract class Element{
 	public static final Element SALT=new SALT();
 	public static final Element OXGN=new OXGN();
 	public static final Element HYGN=new HYGN();
+	public static final Element WTRV=new WTRV();
 	public static final Element WOOD=new WOOD();
 	public static final Element COAL=new COAL();
 	public static final Element SMKE=new SMKE();
@@ -55,12 +58,10 @@ public abstract class Element{
 	public float heat;
 
 	public boolean flammable;
-	public boolean melts;
-	public boolean boils;
 	public boolean stacks;
-	public boolean glows;
+	private boolean exp;
 
-	public Element(String name,State state,int colour,int mass,float heat,boolean flammable,boolean melts,boolean boils){
+	public Element(String name,State state,int colour,int mass,float heat,boolean flammable,boolean exp){
 		try{
 			this.name=name.substring(0,4);
 		}catch(StringIndexOutOfBoundsException fourChar){
@@ -83,8 +84,7 @@ public abstract class Element{
 		this.mass=state.equals(State.SOLID)?100:state.equals(State.GAS)?0:mass<=0?5:mass>=100?95:mass; // GAS:0, LIQUID:50-80, POWDER: 80-99, SOLID: 0, Less than 50 = VERY light elements
 		this.heat=heat;
 		this.flammable=flammable;
-		this.melts=state.equals(State.SOLID)?melts:false;
-		this.boils=state.equals(State.LIQUID)?boils:false;
+		this.exp=flammable&exp;
 		/*
 		 * switch(state){ case SOLID: Main.powder.menu.solids.add(this); break; case LIQUID: Main.powder.menu.liquids.add(this); break; case GAS: Main.powder.menu.gasses.add(this); break; case POWDER: Main.powder.menu.powders.add(this); break; case SPECIAL: Main.powder.menu.hidden.add(this); break; case QUANTUM: Main.powder.menu.quantum.add(this); break; }
 		 */
@@ -105,6 +105,12 @@ public abstract class Element{
 	 * @throws Exception
 	 */
 	public void doPhysics(int x,int y,Particle p) throws Exception{
+		try{
+			tv[x][y]++;
+			tv[x][y]--;
+		}catch(ArrayIndexOutOfBoundsException e){
+			return;
+		}
 		Particle adj=Particle.particleAt(x,y);
 		float delta;
 		float transfer=rand.nextFloat();
@@ -113,14 +119,14 @@ public abstract class Element{
 		if(adj==null){
 			transferPart=transfer<=heat;
 			transferAdj=transfer<=Element.NONE.heat;
-			delta=Physics.tv[x][y]-p.temp;
+			delta=tv[x][y]-p.temp;
 			if(delta<0) delta=-delta;
-			if(p.temp<Physics.tv[x][y]){
+			if(p.temp<tv[x][y]){
 				if(transferPart) p.temp+=delta;
-				if(transferAdj) Physics.tv[x][y]-=delta;
-			}else if(p.temp>Physics.tv[x][y]){
+				if(transferAdj) tv[x][y]-=delta;
+			}else if(p.temp>tv[x][y]){
 				if(transferPart) p.temp-=delta;
-				if(transferAdj) Physics.tv[x][y]+=delta;
+				if(transferAdj) tv[x][y]+=delta;
 			}
 		}else{
 			transferPart=transfer<=heat;
@@ -136,21 +142,32 @@ public abstract class Element{
 			}
 		}
 		if(flammable){
+			float heatPres=0.0f;	//Percentage of maxPres to be added to simulation while burning.
 			if(!p.burning){
 				float ignition;
-				if(this==WOOD)
+				if(this==WOOD){
 					ignition=150.0f;
-				else if(this==COAL)
+					heatPres=0.005f;
+				}else if(this==COAL){
 					ignition=349.0f;
-				else if(this==OXGN||this==HYGN)
+					heatPres=0.01f;
+				}else if(this==OXGN||this==HYGN){
 					ignition=500.0f;
-				else if(this==C4)
+					heatPres=0.25f;
+				}else if(this==C4){
 					ignition=Physics.maxTemp;
-				else throw new Exception("You forgot to specify autoignition temperature of some flammable elements!");
+					heatPres=0.5f;
+				}else throw new Exception("You forgot to specify combustion data of some flammable elements!");
 				if(p.temp>=ignition&&++p.combust%Physics.getBurnRate(this)==0) p.burning=true;
 			}else{
 				if(++p.combust%Physics.getBurnRate(this)==0){
 					changeType(p,FIRE);
+					if(exp){
+						pv[x][y]+=p.temp/(heatPres*maxTemp);
+						for(int i=0;i<rand.nextInt(50*((int)(heatPres*10)+1));i++){
+							createPart(x+rand.nextInt(25)-25,y+rand.nextInt(25)-25,FIRE);
+						}
+					}
 					p.combust=0;
 					return;
 				}
@@ -169,7 +186,10 @@ public abstract class Element{
 		}else if(p.type==PLSM){
 			p.life=rand.nextInt(100)+300;
 			p.temp=Physics.maxTemp;
-		}else{
+		}else if(p.type==WTRV){
+			p.temp=rand.nextInt(50)+100;
+		}
+		else{
 			p.temp=22.0f;
 		}
 	}

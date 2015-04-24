@@ -40,6 +40,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
+import static powderinjava.StaticData.*;
 
 public abstract class Engine extends Canvas implements KeyListener,MouseListener,MouseMotionListener,MouseWheelListener,Runnable{
 
@@ -138,7 +139,7 @@ public abstract class Engine extends Canvas implements KeyListener,MouseListener
 				rFrames=frames;
 				frames=0;
 			}
-			setFpsOutput("FPS:"+rFrames+", Parts: "+Particle.particles.size()+", "+(Main.powder.fancyGraphics?"Fancy Mode":Main.powder.tempGraphics?"Temperature Mode":"Normal Mode"));
+			setFpsOutput("P-I-J "+StaticData.version+"|FPS:"+rFrames+", Parts: "+Particle.particles.size()+", "+(Main.powder.fancyGraphics?"Fancy Display":Main.powder.tempGraphics?"Temperature Display":Main.powder.presGraphics?"Pressure Display":"Normal Display"));
 		}
 		stop();
 	}
@@ -171,12 +172,14 @@ public abstract class Engine extends Canvas implements KeyListener,MouseListener
 		fm=g.getFontMetrics();
 		g.setColor(new Color(0x06739E));
 		g.drawString(fpsOutput,Powder.xMarginLeft,15);
-		String particleData="x:"+Main.powder.mx+", y:"+Main.powder.my;
+		String cursorData="x:"+Main.powder.mx+", y:"+Main.powder.my;
+		String particleData;
 		Particle p=Particle.particleAt(Main.powder.mx,Main.powder.my);
 		if(p!=null)
-			particleData=p.type.name+", Temp: "+rounded(p.temp)+"\u00b0C, life: "+p.life+", "+particleData;
-		else particleData+=" Temp: "+rounded(Physics.tv[Main.powder.mx][Main.powder.my])+"\u00b0C"+" Pressure: "+rounded(Physics.pv[Main.powder.mx][Main.powder.my]);
-		g.drawString(particleData,Powder.xMarginRight()-fm.stringWidth(particleData),15);
+			particleData=p.type.name+", Temp: "+rounded(p.temp)+"\u00b0C, Pressure: "+rounded(pv[Main.powder.mx][Main.powder.my])+" N/m\u00b2";
+		else particleData=" Temp: "+rounded(tv[Main.powder.mx][Main.powder.my])+"\u00b0C"+" Pressure: "+rounded(pv[Main.powder.mx][Main.powder.my])+" N/m\u00b2";
+		g.drawString(particleData,Powder.xMarginRight()-5-fm.stringWidth(particleData),15);
+		g.drawString(cursorData,Powder.xMarginRight()-5-fm.stringWidth(cursorData),30);
 		refresh();
 		g.dispose();
 		bs.show();

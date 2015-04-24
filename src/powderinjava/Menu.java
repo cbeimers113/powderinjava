@@ -17,15 +17,25 @@
 
 package powderinjava;
 
+import static powderinjava.StaticData.pause;
+import static powderinjava.StaticData.play;
+import static powderinjava.StaticData.page;
+import static powderinjava.StaticData.pauseH;
+import static powderinjava.StaticData.playH;
+import static powderinjava.StaticData.pageH;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import powderinjava.elements.Element;
 
 public class Menu{
+
+	private static int[] drawPImageAt;
+	private static int[] drawNewAt;
 
 	public List<Element> liquids;
 	public List<Element> gasses;
@@ -46,7 +56,7 @@ public class Menu{
 	private int MHIDDEN;
 	private int MQUANTUM;
 
-	private boolean b;
+	public boolean b;
 
 	public Menu(){
 		liquids=new ArrayList<Element>();
@@ -96,6 +106,39 @@ public class Menu{
 			g.setColor(e.equals(Main.powder.spawnType)?Color.green:Color.white);
 			g.drawRect(x,y,elSize,elHeight);
 			if(b&&this.x>=x&&this.y>=y&&this.x<=x+elSize&&this.y<=y+elHeight) Main.powder.spawnType=e;
+		}
+		g.setColor(new Color(0x06739E));
+		BufferedImage pImage=Main.powder.paused?play:pause;
+		drawPImageAt=new int[]{
+				Powder.xMarginRight()-5-pImage.getWidth(),
+				Powder.yMarginBottom()+4
+		};
+		drawNewAt=new int[]{
+				Powder.xMarginRight()-5-page.getWidth(),
+				Powder.yMarginBottom()+8+page.getHeight()
+		};
+		if(x>=drawPImageAt[0]&&x<=drawPImageAt[0]+pImage.getWidth()&&y>=drawPImageAt[1]&&y<=drawPImageAt[1]+pImage.getHeight()){
+			pImage=Main.powder.paused?playH:pauseH;
+			g.drawImage(pImage,drawPImageAt[0],drawPImageAt[1],null);
+			String pMsg=(Main.powder.paused?"Plays":"Pauses")+" the simulation.";
+			g.drawString(pMsg,Powder.xMarginRight()-5-fm.stringWidth(pMsg),Powder.yMarginBottom()-5);
+			if(b){
+				Main.powder.paused=!Main.powder.paused;
+				b=false;
+			}
+		}else{
+			g.drawImage(pImage,drawPImageAt[0],drawPImageAt[1],null);
+		}
+		if(x>=drawNewAt[0]&&x<=drawNewAt[0]+page.getWidth()&&y>=drawNewAt[1]&&y<=drawNewAt[1]+page.getHeight()){
+			g.drawImage(pageH,drawNewAt[0],drawNewAt[1],null);
+			String nMsg="Starts a new simulation.";
+			g.drawString(nMsg,Powder.xMarginRight()-5-fm.stringWidth(nMsg),Powder.yMarginBottom()-5);
+			if(b){
+				Main.powder.newSim();
+				b=false;
+			}
+		}else{
+			g.drawImage(page,drawNewAt[0],drawNewAt[1],null);
 		}
 	}
 

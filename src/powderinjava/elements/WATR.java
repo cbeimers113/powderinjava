@@ -25,10 +25,14 @@ import powderinjava.State;
 public class WATR extends Element{
 
 	public WATR(){
-		super("WATR",State.LIQUID,0xff0000ff,50,1.0f,false,false,false);
+		super("WATR",State.LIQUID,0xff0000ff,50,1.0f,false,false);
 	}
 
 	public int update(int x,int y,Particle p){
+		if(p.temp>=100.0f){
+			changeType(p,WTRV);
+			return 1;
+		}
 		return 0;
 	}
 }

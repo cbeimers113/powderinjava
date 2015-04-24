@@ -19,10 +19,16 @@
 
 package powderinjava;
 
+import static powderinjava.StaticData.pmap;
+import static powderinjava.StaticData.pv;
+import static powderinjava.StaticData.tv;
+import static powderinjava.StaticData.vx;
+import static powderinjava.StaticData.vy;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+import java.util.Iterator;
 import powderinjava.elements.Element;
 
 public class Powder extends Engine{
@@ -69,6 +75,7 @@ public class Powder extends Engine{
 
 	public boolean fancyGraphics;
 	public boolean tempGraphics;
+	public boolean presGraphics;
 	public boolean paused;
 	private boolean spawning;
 	private boolean erasing;
@@ -84,7 +91,7 @@ public class Powder extends Engine{
 		fancyGraphics=true;
 		for(int y=0;y<height;y++){
 			for(int x=0;x<width;x++){
-				Physics.pmap[x][y]=null;
+				pmap[x][y]=null;
 			}
 		}
 	}
@@ -112,14 +119,16 @@ public class Powder extends Engine{
 				paused=!paused;
 				break;
 			case KeyEvent.VK_G:
-				if(!fancyGraphics&&!tempGraphics)
+				if(!fancyGraphics&&!tempGraphics&&!presGraphics)
 					fancyGraphics=true;
-				else if(fancyGraphics&&!tempGraphics){
+				else if(fancyGraphics&&!tempGraphics&&!presGraphics){
 					tempGraphics=true;
 					fancyGraphics=false;
-				}else if(!fancyGraphics&&tempGraphics){
-					fancyGraphics=false;
+				}else if(!fancyGraphics&&tempGraphics&&!presGraphics){
+					presGraphics=true;
 					tempGraphics=false;
+				}else if(!fancyGraphics&&!tempGraphics&&presGraphics){
+					presGraphics=false;
 				}
 				break;
 			case 91:
@@ -314,5 +323,19 @@ public class Powder extends Engine{
 		}catch(ArrayIndexOutOfBoundsException e){
 			return;
 		}
+	}
+
+	public void newSim(){
+		for(int y=0;y<height;y++){
+			for(int x=0;x<width;x++){
+				pv[x][y]=0.0f;
+				tv[x][y]=22.0f;
+				vx[x][y]=0.0f;
+				vy[x][y]=0.0f;
+				pmap[x][y]=null;
+			}
+		}
+		for(Iterator<Particle>iterator=Particle.particles.iterator();iterator.hasNext();)
+			iterator.next().remove();
 	}
 }

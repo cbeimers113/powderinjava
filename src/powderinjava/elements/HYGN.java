@@ -23,10 +23,12 @@ import powderinjava.State;
 public class HYGN extends Element{
 
 	public HYGN(){
-		super("HYGN",State.GAS,0x0D86FF,0,3.42f,true,false,false);
+		super("HYGN",State.GAS,0x0D86FF,0,3.42f,true,true);
 	}
 
 	public int update(int x,int y,Particle p){
+		if(elementAt(x,y)==FIRE||elementAt(x,y)==PLSM)
+			p.burning=true;
 		return 0;
 	}
 }

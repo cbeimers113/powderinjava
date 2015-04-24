@@ -24,7 +24,7 @@ import powderinjava.State;
 public class SMKE extends Element{
 
 	public SMKE(){
-		super("SMKE",State.PLASMA,0x454545,0,0.49f,false,false,false);
+		super("SMKE",State.GAS,0x454545,0,0.49f,false,false);
 	}
 
 	public int update(int x,int y,Particle p){

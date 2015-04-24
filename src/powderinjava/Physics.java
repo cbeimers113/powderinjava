@@ -23,14 +23,15 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import powderinjava.elements.Element;
+import static powderinjava.StaticData.*;
 
 public class Physics{
 
-	public static Particle[][] pmap=new Particle[Main.powder.width][Main.powder.height];
-	public static float[][] pv=new float[Main.powder.width][Main.powder.height];
-	public static float[][] tv=new float[Main.powder.width][Main.powder.height];
 	public static float maxTemp=10_000.0f;
 	public static float minTemp=-maxTemp;
+	public static float maxPres=256.0f;
+	public static float minPres=-maxPres;
+	public static float presConst=0.04f;
 	public static int defaultBurnRate=50;
 
 	public int width;
@@ -42,6 +43,8 @@ public class Physics{
 		for(int y=0;y<Main.powder.height;y++){
 			for(int x=0;x<Main.powder.width;x++){
 				pv[x][y]=0.0f;
+				vx[x][y]=0.0f;
+				vy[x][y]=0.0f;
 				tv[x][y]=22.0f;
 			}
 		}
@@ -50,6 +53,12 @@ public class Physics{
 	public void update(Graphics g,BufferedImage img){
 		for(int y=0;y<height;y++){
 			for(int x=0;x<width;x++){
+				try{
+					tv[x][y]++;
+					tv[x][y]--;
+				}catch(ArrayIndexOutOfBoundsException e){
+					return;
+				}
 				// Average pressure and temperature
 				if(!Main.powder.paused){
 					float pAv=0.0f;
@@ -68,18 +77,32 @@ public class Physics{
 					tv[x][y]=tAv/success;
 					if(tv[x][y]>maxTemp) tv[x][y]=maxTemp;
 					if(tv[x][y]<minTemp) tv[x][y]=minTemp;
+					if(pv[x][y]>maxPres) pv[x][y]=maxPres;
+					if(pv[x][y]<minPres) pv[x][y]=minPres;
+					pv[x][y]+=presConst*(tv[x][y]/maxTemp);
+					if(x>Powder.xMarginLeft&&x<Powder.xMarginRight()&&y>Powder.yMarginTop&&y<Powder.yMarginBottom()){
+						float a=pv[x+1][y];
+						float b=pv[x-1][y];
+						float c=pv[x][y-1];
+						float d=pv[x][y+1];
+						vx[x][y]=b-a;
+						vy[x][y]=c-d;
+					}
 				}
 				// /TODO: Pressure check
 				Particle p=pmap[x][y];
 				if(!Main.powder.paused&&p!=null) p.update();
-				if(Main.powder.tempGraphics&&x>Powder.xMarginLeft&&x<Powder.xMarginRight()&&y>Powder.yMarginTop&&y<Powder.yMarginBottom()){
-					boolean ambient=p==null;
-					img.setRGB(x,y,getTempColour(ambient?tv[x][y]:p.temp).getRGB());
+				if(x>Powder.xMarginLeft&&x<Powder.xMarginRight()&&y>Powder.yMarginTop&&y<Powder.yMarginBottom()){
+					if(Main.powder.tempGraphics){
+						boolean ambient=p==null;
+						img.setRGB(x,y,getTempColour(ambient?tv[x][y]:p.temp).getRGB());
+					}
+					if(Main.powder.presGraphics) img.setRGB(x,y,getPresColour(pv[x][y]).getRGB());
 				}
 				// Update Particles
 				if(p==null) continue;
 				if(p.removeQueue){
-					Physics.pmap[x][y]=null;
+					pmap[x][y]=null;
 					continue;
 				}
 				if(Main.powder.fancyGraphics){
@@ -91,7 +114,7 @@ public class Physics{
 							img.setRGB(p.x+ax,p.y+ay,glow.getRGB());
 						}
 						img.setRGB(p.x,p.y,p.type.colour.getRGB());
-					}else if(p.type.state.equals(State.GAS)||p.type.state.equals(State.PLASMA)){
+					}else if(p.type.state.equals(State.GAS)){
 						Color pixel=new Color(glow.getRed(),glow.getGreen(),glow.getBlue(),glow.getAlpha()/3);
 						g.setColor(pixel);
 						g.fillOval(p.x-3/2,p.y-3/2,3,3);
@@ -104,14 +127,26 @@ public class Physics{
 
 	private Color getTempColour(float t){
 		try{
-			return new Color(MapData.heatMap[(int)(t*(MapData.heatMap.length-1)/maxTemp)]);
+			if(t>0)
+				return new Color(heatMapPos[(int)(t*(heatMapPos.length-1)/maxTemp)]);
+			else return new Color(heatMapNeg[(int)(-t*(heatMapNeg.length-1)/maxTemp)]);
 		}catch(ArrayIndexOutOfBoundsException e){
-			return new Color(MapData.heatMap[MapData.heatMap.length-1]);
+			if(t>0)
+				return new Color(heatMapPos[heatMapPos.length-1]);
+			else return new Color(heatMapNeg[heatMapNeg.length-1]);
 		}
 	}
 
-	public void addAir(int x,int y,float pressure){
-		pv[x][y]+=pressure;
+	private Color getPresColour(float p){
+		try{
+			if(p>0)
+				return new Color(pressureMapPos[(int)(p*(pressureMapPos.length-1)/maxPres)]);
+			else return new Color(pressureMapNeg[(int)(p*(pressureMapNeg.length-1)/maxPres)]);
+		}catch(ArrayIndexOutOfBoundsException e){
+			if(p>0)
+				return new Color(pressureMapPos[pressureMapPos.length-1]);
+			else return new Color(pressureMapNeg[pressureMapNeg.length-1]);
+		}
 	}
 
 	public static int getBurnRate(Element e) throws Exception{

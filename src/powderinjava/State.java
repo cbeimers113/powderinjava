@@ -21,5 +21,5 @@ package powderinjava;
 
 public enum State {
 
-	SOLID, LIQUID, GAS, POWDER, SPECIAL, QUANTUM, PLASMA
+	SOLID, LIQUID, GAS, POWDER, SPECIAL, QUANTUM
 }

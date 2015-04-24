@@ -14,19 +14,21 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  **/
+
 package powderinjava.elements;
 
 import powderinjava.Particle;
 import powderinjava.State;
+import powderinjava.StaticData;
 
 public class C4 extends Element{
 
 	public C4(){
-		super("C4",State.SOLID,0xff00c3,100,0.67f,true,false,false);
+		super("C4",State.SOLID,0xff00c3,100,0.67f,true,true);
 	}
 
 	public int update(int x,int y,Particle p){
-		if(elementAt(x,y)==FIRE||elementAt(x,y)==PLSM)
+		if(elementAt(x,y)==FIRE||elementAt(x,y)==PLSM||StaticData.pv[x][y]>=200.0f)
 			p.burning=true;
 		return 0;
 	}
