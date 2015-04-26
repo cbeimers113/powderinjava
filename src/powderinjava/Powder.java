@@ -34,6 +34,8 @@ import java.awt.event.WindowEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import powderinjava.elements.Element;
@@ -56,13 +58,11 @@ public class Powder extends Canvas implements KeyListener,MouseListener,MouseMot
 	public static final int HEIGHT=475;
 
 	public static int xMarginLeft=10;
-	public static int xMarginRight=WIDTH-xMarginLeft;
+	public static int xMarginRight=WIDTH-2*xMarginLeft;
 	public static int yMarginTop=20;
 	public static int yMarginBottom=HEIGHT-4*yMarginTop;
 	public static int mx;
 	public static int my;
-	public static int SIMWIDTH=WIDTH;
-	public static int SIMHEIGHT=HEIGHT;
 	private static int cursorRadius;
 
 	public static boolean fancyGraphics;
@@ -96,13 +96,14 @@ public class Powder extends Canvas implements KeyListener,MouseListener,MouseMot
 	public static boolean tickMaps;
 	public static boolean isCloseRequested;
 
-	public static String version="1.0.0";
+	public static String version="1.0.1";		//<major> . <minor> . <maintenance>
 
-	public static Particle[][] pmap=new Particle[SIMWIDTH][SIMHEIGHT];
-	public static float[][] pv=new float[SIMWIDTH][SIMHEIGHT];
-	public static float[][] tv=new float[SIMWIDTH][SIMHEIGHT];
-	public static float[][] vx=new float[SIMWIDTH][SIMHEIGHT];
-	public static float[][] vy=new float[SIMWIDTH][SIMHEIGHT];
+	public static Particle[][] pmap=new Particle[WIDTH][HEIGHT];
+	public static Wall[][]bmap=new Wall[WIDTH/2][HEIGHT/2];
+	public static float[][] pv=new float[WIDTH][HEIGHT];
+	public static float[][] tv=new float[WIDTH][HEIGHT];
+	public static float[][] vx=new float[WIDTH][HEIGHT];
+	public static float[][] vy=new float[WIDTH][HEIGHT];
 
 	public static float maxTemp=10_000.0f;
 	public static float minTemp=-maxTemp;
@@ -279,6 +280,11 @@ public class Powder extends Canvas implements KeyListener,MouseListener,MouseMot
 				tv[x][y]=22.0f;
 			}
 		}
+		for(int y=0;y<HEIGHT/2;y++){
+			for(int x=0;x<WIDTH/2;x++){
+				bmap[x][y]=null;
+			}
+		}
 	}
 
 	private static void refresh(){
@@ -321,7 +327,7 @@ public class Powder extends Canvas implements KeyListener,MouseListener,MouseMot
 		menu.render(g);
 		if(spawning&&!erasing) fillCursor(cursorRadius);
 		if(!spawning&&erasing) eraseCursor(cursorRadius);
-		parts=0;
+		List<Particle>counted=new ArrayList<Particle>();
 		for(int y=0;y<HEIGHT;y++){
 			for(int x=0;x<WIDTH;x++){
 				try{
@@ -346,7 +352,9 @@ public class Powder extends Canvas implements KeyListener,MouseListener,MouseMot
 					continue;
 				}else{
 					if(!paused) p.update();
-					parts++;
+					if(!counted.contains(p)){
+						counted.add(p);
+					}
 				}
 				tickMaps=true;
 				if(Powder.fancyGraphics){
@@ -370,6 +378,9 @@ public class Powder extends Canvas implements KeyListener,MouseListener,MouseMot
 				}
 			}
 		}
+		parts=counted.size();
+		//draw walls
+//		if(bmap[x][y])
 		drawCursor(mx,my,cursorRadius);
 		g.drawImage(img,0,0,null);
 		FontMetrics fm;

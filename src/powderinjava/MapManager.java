@@ -12,13 +12,13 @@
 
 package powderinjava;
 
+import static powderinjava.Powder.maxPres;
+import static powderinjava.Powder.maxTemp;
+import static powderinjava.Powder.minPres;
+import static powderinjava.Powder.minTemp;
+import static powderinjava.Powder.presConst;
 import static powderinjava.Powder.pv;
 import static powderinjava.Powder.tv;
-import static powderinjava.Powder.maxTemp;
-import static powderinjava.Powder.minTemp;
-import static powderinjava.Powder.maxPres;
-import static powderinjava.Powder.minPres;
-import static powderinjava.Powder.presConst;
 import static powderinjava.Powder.vx;
 import static powderinjava.Powder.vy;
 
@@ -43,45 +43,44 @@ public class MapManager{
 				if(!Powder.paused){
 					float pAv=0.0f;
 					float tAv=0.0f;
-					float success=0.0f;
+					float s=0.0f;
 					for(int i=0;i<8;i++){
 						int ax=i==0||i==6||i==7?-1:i==1||i==5?0:1;
 						int ay=i==0||i==1||i==2?-1:i==3||i==7?0:1;
 						if(x+ax>Powder.xMarginLeft&&x+ax<Powder.xMarginRight&&y+ay>Powder.yMarginTop&&y+ay<Powder.yMarginBottom){
-							pAv+=pv[x+ax][y+ay];
 							tAv+=tv[x+ax][y+ay];
-							success++;
-						}
-						if(x-1>=Powder.xMarginLeft&&x+1<=Powder.xMarginRight&&y-1>=Powder.yMarginTop&&y+1<=Powder.yMarginBottom){
-							float dp=0.0f;
-							float dx=0.0f;
-							float dy=0.0f;
-							dp+=vx[x-1][y]-vx[x][y];
-							dp+=vy[x][y-1]-vy[x][y];
-							pv[x][y]*=0.9999f;
-							pv[x][y]+=dp*0.3f;
-							dx+=pv[x][y]-pv[x+1][y];
-							dy+=pv[x][y]-pv[x][y+1];
-							vx[x][y]*=0.999f;
-							vy[x][y]*=0.999f;
-							vx[x][y]+=dx*0.4f;
-							vy[x][y]+=dy*0.4f;
+							s++;
 						}
 					}
-					pv[x][y]=pAv/success;
-					tv[x][y]=tAv/success;
+					tv[x][y]=tAv/s;
+					s=0.0f;
+					for(int i=0;i<16;i++){
+						int ax=i==0||(i>=12&&i<=15)?-2:i==1||i==11?-1:i==2||i==10?0:i==3||i==9?1:2;
+						int ay=i>=0&&i<=4?-2:i==5||i==15?-1:i==6||i==14?0:i==7||i==13?1:2;
+						if(x+ax>Powder.xMarginLeft&&x+ax<Powder.xMarginRight&&y+ay>Powder.yMarginTop&&y+ay<Powder.yMarginBottom){
+							pAv+=pv[x+ax][y+ay];
+							s++;
+						}
+					}
+					pv[x][y]=pAv/s;
 					if(tv[x][y]>maxTemp) tv[x][y]=maxTemp;
 					if(tv[x][y]<minTemp) tv[x][y]=minTemp;
 					if(pv[x][y]>maxPres) pv[x][y]=maxPres;
 					if(pv[x][y]<minPres) pv[x][y]=minPres;
 					pv[x][y]+=presConst*(tv[x][y]/maxTemp);
-					if(x>Powder.xMarginLeft&&x<Powder.xMarginRight&&y>Powder.yMarginTop&&y<Powder.yMarginBottom){
+					if(x-1>Powder.xMarginLeft&&x+1<Powder.xMarginRight&&y-1>Powder.yMarginTop&&y+1<Powder.yMarginBottom){
 						float a=pv[x+1][y];
 						float b=pv[x-1][y];
 						float c=pv[x][y-1];
 						float d=pv[x][y+1];
 						vx[x][y]=b-a;
 						vy[x][y]=c-d;
+						int nvx=x+(int)Math.ceil(vx[x][y]);
+						int nvy=y+(int)Math.ceil(vy[x][y]);
+						if(nvx<Powder.xMarginRight||nvx>Powder.xMarginLeft||nvy<Powder.yMarginTop||nvy>Powder.yMarginBottom)continue;
+						float mag=(float)Math.sqrt(nvx*nvx+nvy*nvy);
+						int[]normal=new int[]{(int)(nvx/mag),(int)(nvy/mag)};
+						pv[normal[0]][normal[1]]=pv[x][y]=(pv[normal[0]][normal[1]]+pv[x][y])/2;
 					}
 				}
 			}
