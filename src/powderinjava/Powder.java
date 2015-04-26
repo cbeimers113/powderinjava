@@ -400,7 +400,7 @@ public class Powder extends Canvas implements KeyListener,MouseListener,MouseMot
 		Particle p=Particle.particleAt(mx,my);
 		if(p!=null)
 			particleData=p.type.name+", Temp: "+rounded(p.temp)+"\u00b0C, Pressure: "+rounded(pv[mx][my])+" N/m\u00b2";
-		else particleData=" Temp: "+rounded(tv[mx][my])+"\u00b0C"+" Pressure: "+rounded(pv[mx][my])+" N/m\u00b2";
+		else particleData="Empty, Temp: "+rounded(tv[mx][my])+"\u00b0C"+" Pressure: "+rounded(pv[mx][my])+" N/m\u00b2";
 		g.drawString(particleData,xMarginRight-5-fm.stringWidth(particleData),15);
 		g.drawString(cursorData,xMarginRight-5-fm.stringWidth(cursorData),30);
 		refresh();
