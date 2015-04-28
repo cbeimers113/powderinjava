@@ -1,20 +1,13 @@
 /**
- *	@Copyright 2015 firefreak11
+ * @Copyright 2015 firefreak11
  *
- *	This file is part of PowderInJava.
+ *            This file is part of PowderInJava.
  *
- *	PowderInJava is free software: you can redistribute it and/or modify
- *	it under the terms of the GNU General Public License as published by
- *	the Free Software Foundation, either version 3 of the License, or
- *	(at your option) any later version.
+ *            PowderInJava is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
  *
- *	PowderInJava is distributed in the hope that it will be useful,
- *	but WITHOUT ANY WARRANTY; without even the implied warranty of
- *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *	GNU General Public License for more details.
+ *            PowderInJava is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
- *	You should have received a copy of the GNU General Public License
- *	along with PowderInJava.  If not, see <http://www.gnu.org/licenses/>.
+ *            You should have received a copy of the GNU General Public License along with PowderInJava. If not, see <http://www.gnu.org/licenses/>.
  **/
 
 package powderinjava.elements;
@@ -66,7 +59,7 @@ public abstract class Element{
 	public boolean stacks;
 	private boolean exp;
 
-	public Element(Class<?>sClass,State state,int colour,int mass,float heat,boolean flammable,boolean exp,String desc){
+	public Element(Class<?> sClass,State state,int colour,int mass,float heat,boolean flammable,boolean exp,String desc){
 		String name=sClass.getSimpleName();
 		try{
 			this.name=name.substring(0,4);
@@ -149,7 +142,7 @@ public abstract class Element{
 			}
 		}
 		if(flammable){
-			float heatPres=0.0f;	//Percentage of maxPres to be added to simulation while burning.
+			float heatPres=0.0f; // Percentage of maxPres to be added to simulation while burning.
 			if(!p.burning){
 				float ignition;
 				if(this==WOOD){
@@ -195,8 +188,7 @@ public abstract class Element{
 			p.temp=maxTemp;
 		}else if(p.type==WTRV){
 			p.temp=rand.nextInt(50)+100;
-		}
-		else{
+		}else{
 			p.temp=22.0f;
 		}
 	}

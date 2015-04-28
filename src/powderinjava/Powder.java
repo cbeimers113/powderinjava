@@ -93,13 +93,12 @@ public class Powder extends Canvas implements KeyListener,MouseListener,MouseMot
 
 	public static boolean resizable;
 	public static boolean fullscreen;
-	public static boolean tickMaps;
 	public static boolean isCloseRequested;
 
-	public static String version="1.0.1";		//<major> . <minor> . <maintenance>
+	public static String version="1.0.2"; // <major> . <minor> . <maintenance>
 
 	public static Particle[][] pmap=new Particle[WIDTH][HEIGHT];
-	public static Wall[][]bmap=new Wall[WIDTH/2][HEIGHT/2];
+	public static Wall[][] bmap=new Wall[WIDTH/2][HEIGHT/2];
 	public static float[][] pv=new float[WIDTH][HEIGHT];
 	public static float[][] tv=new float[WIDTH][HEIGHT];
 	public static float[][] vx=new float[WIDTH][HEIGHT];
@@ -298,7 +297,7 @@ public class Powder extends Canvas implements KeyListener,MouseListener,MouseMot
 
 	public void run(){
 		initPowder();
-		MapManager.start();
+		Physics.start();
 		long timer=System.currentTimeMillis();
 		int frames=0;
 		int rFrames=frames;
@@ -327,7 +326,7 @@ public class Powder extends Canvas implements KeyListener,MouseListener,MouseMot
 		menu.render(g);
 		if(spawning&&!erasing) fillCursor(cursorRadius);
 		if(!spawning&&erasing) eraseCursor(cursorRadius);
-		List<Particle>counted=new ArrayList<Particle>();
+		List<Particle> counted=new ArrayList<Particle>();
 		for(int y=0;y<HEIGHT;y++){
 			for(int x=0;x<WIDTH;x++){
 				try{
@@ -336,7 +335,6 @@ public class Powder extends Canvas implements KeyListener,MouseListener,MouseMot
 				}catch(ArrayIndexOutOfBoundsException e){
 					return;
 				}
-				tickMaps=false;
 				Particle p=pmap[x][y];
 				if(x>Powder.xMarginLeft&&x<Powder.xMarginRight&&y>Powder.yMarginTop&&y<Powder.yMarginBottom){
 					if(Powder.tempGraphics){
@@ -350,13 +348,9 @@ public class Powder extends Canvas implements KeyListener,MouseListener,MouseMot
 				if(p.removeQueue){
 					pmap[x][y]=null;
 					continue;
-				}else{
-					if(!paused) p.update();
-					if(!counted.contains(p)){
-						counted.add(p);
-					}
 				}
-				tickMaps=true;
+				if(!paused) p.update();
+				if(!counted.contains(p)) counted.add(p);
 				if(Powder.fancyGraphics){
 					Color glow=new Color(p.extraColour.getRed(),p.extraColour.getGreen(),p.extraColour.getBlue(),p.extraColour.getAlpha());
 					if(p.type.state.equals(State.LIQUID)){
@@ -379,8 +373,8 @@ public class Powder extends Canvas implements KeyListener,MouseListener,MouseMot
 			}
 		}
 		parts=counted.size();
-		//draw walls
-//		if(bmap[x][y])
+		// draw walls
+		// if(bmap[x][y])
 		drawCursor(mx,my,cursorRadius);
 		g.drawImage(img,0,0,null);
 		FontMetrics fm;
@@ -411,6 +405,11 @@ public class Powder extends Canvas implements KeyListener,MouseListener,MouseMot
 	public static void spawnParticle(int x,int y,Element spawnType){
 		if(Particle.particleAt(x,y)!=null||x<=xMarginLeft||x>=xMarginRight||y<=yMarginTop||y>=yMarginBottom) return;
 		new Particle(x,y,spawnType);
+	}
+
+	public static void eraseParticle(int x,int y){
+		if(Particle.particleAt(x,y)==null||x<=xMarginLeft||x>=xMarginRight||y<=yMarginTop||y>=yMarginBottom) return;
+		pmap[x][y]=null;
 	}
 
 	private static float rounded(float f){
@@ -557,118 +556,23 @@ public class Powder extends Canvas implements KeyListener,MouseListener,MouseMot
 	}
 
 	public static void fillCursor(int radius){
-		if(radius==0){
-			spawnParticle(mx,my,spawnType);
-			return;
-		}
-		int x=radius;
-		int y=0;
-		int radiusError=1-x;
-
-		while(x>=y){
-			spawnParticle(x+mx,y+my,spawnType);
-			spawnParticle(y+mx,x+my,spawnType);
-			spawnParticle(-x+mx,y+my,spawnType);
-			spawnParticle(-y+mx,x+my,spawnType);
-			spawnParticle(-x+mx,-y+my,spawnType);
-			spawnParticle(-y+mx,-x+my,spawnType);
-			spawnParticle(x+mx,-y+my,spawnType);
-			spawnParticle(y+mx,-x+my,spawnType);
-			y++;
-			if(radiusError<0){
-				radiusError+=2*y+1;
-			}else{
-				x--;
-				radiusError+=2*(y-x)+1;
-			}
-		}
-		fillCursor(--radius);
+		if(radius<0) return;
+		for(int y=-radius;y<=radius;y++)
+			for(int x=-radius;x<=radius;x++)
+				if(x*x+y*y<=radius*radius+radius*0.8f) spawnParticle(x+mx,y+my,spawnType);
 	}
 
 	public static void eraseCursor(int radius){
-		if(radius<=0) try{
-			Particle.particleAt(mx,my).remove();
-			return;
-		}catch(NullPointerException e){
-			return;
-		}
-		int x=radius;
-		int y=0;
-		int radiusError=1-x;
-		while(x>=y){
-			try{
-				Particle.particleAt(x+mx,y+my).remove();
-			}catch(NullPointerException e){
-
-			}
-			try{
-				Particle.particleAt(y+mx,x+my).remove();
-			}catch(NullPointerException e){
-
-			}
-			try{
-				Particle.particleAt(-x+mx,y+my).remove();
-			}catch(NullPointerException e){
-
-			}
-			try{
-				Particle.particleAt(-y+mx,x+my).remove();
-			}catch(NullPointerException e){
-
-			}
-			try{
-				Particle.particleAt(-x+mx,-y+my).remove();
-			}catch(NullPointerException e){
-
-			}
-			try{
-				Particle.particleAt(-y+mx,-x+my).remove();
-			}catch(NullPointerException e){
-
-			}
-			try{
-				Particle.particleAt(x+mx,-y+my).remove();
-			}catch(NullPointerException e){
-
-			}
-			try{
-				Particle.particleAt(y+mx,-x+my).remove();
-			}catch(NullPointerException e){
-
-			}
-			y++;
-			if(radiusError<0){
-				radiusError+=2*y+1;
-			}else{
-				x--;
-				radiusError+=2*(y-x)+1;
-			}
-		}
-		eraseCursor(--radius);
+		if(radius<0) return;
+		for(int y=-radius;y<=radius;y++)
+			for(int x=-radius;x<=radius;x++)
+				if(x*x+y*y<=radius*radius+radius*0.8f) eraseParticle(x+mx,y+my);
 	}
 
 	public static void drawCursor(int x0,int y0,int radius){
-		int x=radius;
-		int y=0;
-		int radiusError=1-x;
-
-		while(x>=y){
-			drawPixel(x+x0,y+y0,0xffaaaaaa);
-			drawPixel(y+x0,x+y0,0xffaaaaaa);
-			drawPixel(-x+x0,y+y0,0xffaaaaaa);
-			drawPixel(-y+x0,x+y0,0xffaaaaaa);
-			drawPixel(-x+x0,-y+y0,0xffaaaaaa);
-			drawPixel(-y+x0,-x+y0,0xffaaaaaa);
-			drawPixel(x+x0,-y+y0,0xffaaaaaa);
-			drawPixel(y+x0,-x+y0,0xffaaaaaa);
-			y++;
-			if(radiusError<0){
-				radiusError+=2*y+1;
-			}else{
-				x--;
-				radiusError+=2*(y-x)+1;
-			}
-		}
+		for(int y=-radius;y<=radius;y++)
+			for(int x=-radius;x<=radius;x++)
+				if(x*x+y*y<=radius*radius+radius*0.8f+1&&x*x+y*y>=radius*radius-radius*0.8f-1) drawPixel(x+x0,y+y0,0xffcccccc);
 	}
 
 	public static void drawPixel(int x,int y,int colour){

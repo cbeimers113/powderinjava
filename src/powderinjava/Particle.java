@@ -1,20 +1,13 @@
 /**
- *	@Copyright 2015 firefreak11
+ * @Copyright 2015 firefreak11
  *
- *	This file is part of PowderInJava.
+ *            This file is part of PowderInJava.
  *
- *	PowderInJava is free software: you can redistribute it and/or modify
- *	it under the terms of the GNU General Public License as published by
- *	the Free Software Foundation, either version 3 of the License, or
- *	(at your option) any later version.
+ *            PowderInJava is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
  *
- *	PowderInJava is distributed in the hope that it will be useful,
- *	but WITHOUT ANY WARRANTY; without even the implied warranty of
- *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *	GNU General Public License for more details.
+ *            PowderInJava is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
- *	You should have received a copy of the GNU General Public License
- *	along with PowderInJava.  If not, see <http://www.gnu.org/licenses/>.
+ *            You should have received a copy of the GNU General Public License along with PowderInJava. If not, see <http://www.gnu.org/licenses/>.
  **/
 
 package powderinjava;
@@ -28,7 +21,7 @@ import powderinjava.elements.Element;
  */
 
 public class Particle{
-	
+
 	public Element type;
 	public Element ctype;
 	public Color extraColour;
@@ -108,11 +101,12 @@ public class Particle{
 			default:
 				break;
 		}
-		if(temp>Powder.maxTemp)temp=Powder.maxTemp;
-		if(temp<Powder.minTemp)temp=Powder.minTemp;
+		if(temp>Powder.maxTemp) temp=Powder.maxTemp;
+		if(temp<Powder.minTemp) temp=Powder.minTemp;
 		try{
-			if(Powder.tv[x][y-1]<temp&&type.mass<=5)displace(0,-1);
-		}catch(ArrayIndexOutOfBoundsException e){}
+			if(Powder.tv[x][y-1]<temp&&type.mass<=5) displace(0,-1);
+		}catch(ArrayIndexOutOfBoundsException e){
+		}
 		for(int i=0;i<8;i++){
 			int ax=i<3?x-1:i<4?x:x+1;
 			int ay=i==0||i==3||i==5?y+1:i==1||i==6?y:y-1;
@@ -132,7 +126,12 @@ public class Particle{
 	}
 
 	public void displace(int xDest,int yDest){
-		if(x+xDest==Powder.xMarginLeft||y+yDest==Powder.yMarginTop||x+xDest==Powder.xMarginRight||y+yDest==Powder.yMarginBottom){// Collide with the borders
+		if(x+xDest==Powder.xMarginLeft||x+xDest==Powder.xMarginRight){
+			if(type.mass<=5)vx*=-1;
+			return;
+		}
+		if(y+yDest==Powder.yMarginTop||y+yDest==Powder.yMarginBottom){
+			if(type.mass<=5)vy*=-1;
 			return;
 		}
 		Particle check=particleAt(x+xDest,y+yDest);
@@ -149,8 +148,7 @@ public class Particle{
 				}
 				return;
 			}
-			if(check!=this) 
-				check.displace(rand.nextInt(2)==0?1:-1,-1);
+			if(check!=this) check.displace(rand.nextInt(2)==0?1:-1,-1);
 		}
 		if(++t%((type.mass>>5)+1)==0){
 			int px=x;
@@ -159,8 +157,7 @@ public class Particle{
 			y+=yDest+Powder.vy[px][py];
 			Powder.pmap[px][py]=null;
 			t=0;
-			if(x<Powder.xMarginLeft||y<Powder.yMarginTop||x>Powder.xMarginRight||y>Powder.yMarginBottom||type.equals(Element.NONE))
-				remove();
+			if(x<Powder.xMarginLeft||y<Powder.yMarginTop||x>Powder.xMarginRight||y>Powder.yMarginBottom||type.equals(Element.NONE)) remove();
 		}
 	}
 

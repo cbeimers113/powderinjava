@@ -22,7 +22,7 @@ import static powderinjava.Powder.tv;
 import static powderinjava.Powder.vx;
 import static powderinjava.Powder.vy;
 
-public class MapManager{
+public class Physics{
 
 	private static Thread thread;
 
@@ -79,11 +79,26 @@ public class MapManager{
 						int nvy=y+(int)Math.ceil(vy[x][y]);
 						if(nvx<Powder.xMarginRight||nvx>Powder.xMarginLeft||nvy<Powder.yMarginTop||nvy>Powder.yMarginBottom)continue;
 						float mag=(float)Math.sqrt(nvx*nvx+nvy*nvy);
-						int[]normal=new int[]{(int)(nvx/mag),(int)(nvy/mag)};
+						int[]normal=new int[]{(int)Math.ceil(nvx/mag),(int)Math.ceil(nvy/mag)};
 						pv[normal[0]][normal[1]]=pv[x][y]=(pv[normal[0]][normal[1]]+pv[x][y])/2;
+						displacePressure(x,y,normal[0]*2,normal[1]*2);
 					}
 				}
 			}
+		}
+	}
+	
+	private static void displacePressure(int x, int y, int xd, int yd){
+		int px=x;
+		int py=y;
+		try{
+			float ppv=pv[(int)(x+xd+vx[x][y])][(int)(y+yd+vy[x][y])];
+			x+=xd+vx[px][py];
+			y+=yd+vy[px][py];
+			pv[x][y]=pv[px][py];
+			pv[px][py]=ppv;
+		}catch(ArrayIndexOutOfBoundsException e){
+			return;
 		}
 	}
 }

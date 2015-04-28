@@ -18,8 +18,8 @@
 package powderinjava.elements;
 
 import powderinjava.Particle;
-import powderinjava.State;
 import powderinjava.Powder;
+import powderinjava.State;
 
 public class C4 extends Element{
 
