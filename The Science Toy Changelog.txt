@@ -44,3 +44,6 @@ Changelog
 5 May 2015 *New Icon
 6 May 2015 +QARK, quark, has unique properties including flavour, mass, and colour
 7 May 2015 *HUD Info for quarks
+8 May 2015 *Prop tool can now change quark flavour
+8 May 2015 *Better names for properties in prop tool
+8 May 2015 *Uranium can undergo fission
