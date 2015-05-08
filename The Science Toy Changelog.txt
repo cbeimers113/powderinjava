@@ -1,0 +1,46 @@
+Changelog
+5 Sept 2014 *UI changes
+5 Sept 2014 +SDUM: Sodium, an alkaline metal.
+5 Sept 2014 +CLRN: Chlorine, a halogen.
+5 Sept 2014 *CLRN+HYGN->ACID(CLRN)
+5 Sept 2014 *CLRN+SDUM->SALT
+5 Sept 2014 *ACID(CLRN) does not eat HYGN or CLRN
+5 Sept 2014 *RBDM is now a powder
+5 Sept 2014 *NBLE is now HLUM: Helium.
+5 Sept 2014 +CRBN: Carbon. Essential to organic compounds.
+5 Sept 2014 +HCBN: Hydrocarbon. Formed from CRBN and HYGN
+5 Sept 2014 *Organic chemistry: When C and H bond, it forms HCBN CxHy, x=C's life, y=H's life
+                  The formed hydrocarbon's formula is CxHy, x=life, y=tmp
+6 Sept 2014 *HUD Mode updated for organic chemicals. Hover over it to see name and formula
+6 Sept 2014 *OIL and HCBN must be made from carbon and hydrogen
+6 Sept 2014 *GAS is replaced with hydrocarbons
+6 Sept 2014 *Hydrocarbons with too many carbons will become oil (kerosene)
+6 Sept 2014 *Kerosene evapourates at low pressures
+6 Sept 2014  Release, Version 1.0
+7 Sept 2014 *Kerosene data display 
+7 Sept 2014 *OIL->GAS->HCBN is now OIL->HCBN
+7 Sept 2014 *If a carbon touches a hydrocarbon with the same temp, the carbon joins the hydrocarbon.
+7 Sept 2014 *If a hydrogen touches an unsaturated hydrocarbon, the hydrogen joins the hydrocarbon. 
+7 Sept 2014 *The above reactions only take place if the energy level (temp) is sufficient
+7 Sept 2014 *The energy level (temp) of hydrocarbons change rapidly
+7 Sept 2014 +Parrafin, a powdered form of unsaturated hydrocarbons
+7 Sept 2014 *Hydrocarbon gasses, kerosene, and parrafin are unified into one system
+7 Sept 2014 *UI Updated so that the chemistry UI works in and out of debug mode
+7 Sept 2014 *An alkene or alkyne's tmp2 sets the double/triple bond location on the chain
+7 Sept 2014 *The UI displays alkene/alkyne bond locations
+8 Sept 2014 +new particle data to store carbon, hydrogen, halogens, alcohols etc instead of life, tmp, etc
+8 Sept 2014 *Beginning new unified, more accurate and indepenent system of naming and creating organic compounds. To keep things simple for now, alkynes and alkenes can only have one double/triple bond.
+10 Sept 2014 *View list below for an update on possible chemicals to synthesize in the next release.
+10 Sept 2014 *Hydrocarbon creation: a CRBN with life C joins with HYGN with life H and forms hydrocarbon with carbon and hydrogen properties C and H
+10 Sept 2014 *Independant energy property for chemicals replaces temp from previous hydrocarbon growing technique
+12 Sept 2014 *Some lesser used variables removed from prop tool to make room for carbon, hydrogen, etc
+12 Sept 2014 +HXDE, hydroxide ion, made from heating and mixing hydrogen and oxygen, adds alcohol group to hydrocarbons
+12 Sept 2014 *Hydrocarbons can now form chloro-hydrocarbons and hydrocarbon alcohols by adding chlorine or hydroxide and adding energy to the system.
+12 Sept 2014 *Smoother state transitions between oil/gas/waxy hydrocarbons
+13 Sept 2014 +New Icon!
+13 Sept 2014 Release, Version 1.1
+13 Sept 2014 +BNZN, benzene, can become benzyl or phenyl
+2 Oct 2014 Release, Version 1.2
+5 May 2015 *New Icon
+6 May 2015 +QARK, quark, has unique properties including flavour, mass, and colour
+7 May 2015 *HUD Info for quarks
