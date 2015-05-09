@@ -47,3 +47,7 @@ Changelog
 8 May 2015 *Prop tool can now change quark flavour
 8 May 2015 *Better names for properties in prop tool
 8 May 2015 *Uranium can undergo fission
+8 May 2015 +Gluons and the gluon field (strong nuclear interaction)
+8 May 2015 -Quark spin
+8 May 2015 +Quark colour charge
+8 May 2015 *Quarks must now have correct colour charges and be inside the gluon field to bind
