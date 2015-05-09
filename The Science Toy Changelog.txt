@@ -51,3 +51,6 @@ Changelog
 8 May 2015 -Quark spin
 8 May 2015 +Quark colour charge
 8 May 2015 *Quarks must now have correct colour charges and be inside the gluon field to bind
+9 May 2015 *Photons now actually travel very fast
+9 May 2015 *Gluons and gravitons also travel fast due to small mass
+9 May 2015 *Quarks will decay quickly if there are now other quarks nearby or if they aren't in the gluon field
