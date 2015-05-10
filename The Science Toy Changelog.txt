@@ -55,3 +55,5 @@ Changelog
 9 May 2015 *Gluons and gravitons also travel fast due to small mass
 9 May 2015 *Quarks will decay quickly if there are now other quarks nearby or if they aren't in the gluon field
 9 May 2015 +Signs can now display ambient heat using {h}
+9 May 2015 Release, Version 1.3
+10 May 2015 *Quarks will join together and make a hadron where they basically fly around together, if the flavours are not sufficient to make a neutron or proton.
